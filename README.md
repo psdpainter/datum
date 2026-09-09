@@ -2,7 +2,11 @@
 Data visualization library for enterprise web apps
 
 # Instructions
-No installation. Download from [https://theurl.com](the-link-goes-here)
+No installation. Include from [https://theurl.com](the-link-goes-here).
+
+```
+import { Datum } from '<the-url-here>'
+```
 
 ## Bar chart
 
