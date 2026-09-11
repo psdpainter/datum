@@ -1,4 +1,4 @@
-import { Color, Datum } from './datum.js';
+import { Color, Datum } from './src/datum.js';
 import { 
   ohlcData, 
   salesData, 

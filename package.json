@@ -1,0 +1,30 @@
+{
+  "name": "@psdpainter/datum-js",
+  "version": "1.0.0",
+  "description": "Lightweight, data visualization library for enterprise web apps",
+  "type": "module",
+  "main": "./dist/datum.js",
+  "module": "./dist/datum.js",
+  "style": "./dist/datum.css",
+  "exports": {
+    ".": {
+      "import": "./dist/datum.js",
+      "default": "./dist/datum.js"
+    },
+    "./style": "./dist/datum.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "npx serve",
+    "build:esm": "esbuild src/datum.js --bundle --minify --format=esm --outfile=dist/datum.js",
+    "build:iife": "esbuild src/datum.js --bundle --minify --format=iife --global-name=Datum --outfile=dist/datum.min.js",
+    "build:css": "esbuild src/datum.css --minify --outfile=dist/datum.css",
+    "build": "npm run build:esm && npm run build:iife && npm run build:css",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

@@ -1,0 +1,11 @@
+# Demo and development files
+index.html
+site.js
+datum-logo.ai
+aapl_daily_ohlc_past_year.json
+
+# Local environment and OS files
+.DS_Store
+*.log
+.vscode/
+.idea/
