@@ -9,7 +9,11 @@ import { Datum } from '<the-url-here>'
 ```
 
 ## Bar chart
+This is a test. 
 
+```
+const foo = 'foo'
+```
 
 ## Line chart
 
