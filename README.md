@@ -2,23 +2,5 @@
 Data visualization library for enterprise web apps
 
 # Instructions
-No installation. Include from [https://theurl.com](the-link-goes-here).
+No installation. Include from [https://www.npmjs.com/package/@psdpainter/datum-js](https://www.npmjs.com/package/@psdpainter/datum-js).
 
-```
-import { Datum } from '<the-url-here>'
-```
-
-## Bar chart
-This is a test. 
-
-```
-const foo = 'foo'
-```
-
-## Line chart
-
-
-## Area chart
-
-
-## Dot chart
