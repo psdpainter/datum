@@ -7,7 +7,7 @@ const DEFAULT_OPTIONS = {
   downColor: Color.Red,
   strokeWidth: 1,
   rx: 1,
-  bodyRatio: 0.6 // Ratio of band width allocated to candle body
+  bodyRatio: 0.6
 };
 
 export function candlestick(data = [], keysAndOptions = {}) {
@@ -59,7 +59,7 @@ export function renderCandlestickLayer(layer, context) {
     const bodyY = Math.min(yOpen, yClose);
     const bodyHeight = Math.max(1, Math.abs(yOpen - yClose));
 
-    // 1. Wick Line (High to Low)
+    // 1. High-Low Wick
     const wick = document.createElementNS(SVG_NS, 'line');
     wick.setAttribute('x1', band.center);
     wick.setAttribute('x2', band.center);
@@ -69,7 +69,7 @@ export function renderCandlestickLayer(layer, context) {
     wick.setAttribute('stroke-width', options.strokeWidth);
     svg.appendChild(wick);
 
-    // 2. Real Body (Open vs Close)
+    // 2. Open-Close Body
     const rect = document.createElementNS(SVG_NS, 'rect');
     rect.setAttribute('x', candleX);
     rect.setAttribute('y', bodyY);

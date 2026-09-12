@@ -1,25 +1,17 @@
-import { Color } from './datum-core.js';
+// src/datum-line.js
+import { DEFAULT_SERIES_COLORS } from './datum-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-
-const DEFAULT_LINE_COLORS = [
-  Color.Blue,
-  Color.Cyan,
-  Color.Orange,
-  Color.Purple,
-  Color.Green
-];
 
 export function line(data = [], keysAndOptions = {}) {
   const {
     x = 'x',
     y = 'y',
     stroke,
-    strokeWidth = 2
+    strokeWidth = 1
   } = keysAndOptions;
 
-  // Normalize primitives [10, 25, ...] -> [{ x: 1, y: 10 }, { x: 2, y: 25 }, ...]
-  const normalizedData = data.map((item, index) => {
+  const normalizedData = (data || []).map((item, index) => {
     if (typeof item === 'number') {
       return { [x]: index + 1, [y]: item };
     }
@@ -40,9 +32,9 @@ export function renderLineLayer(layer, context, layerIndex = 0) {
 
   if (!data || data.length === 0) return;
 
-  const fallbackColor = DEFAULT_LINE_COLORS[layerIndex % DEFAULT_LINE_COLORS.length];
+  const fallbackColor = DEFAULT_SERIES_COLORS[layerIndex % DEFAULT_SERIES_COLORS.length];
   const color = options.stroke || fallbackColor;
-  const strokeWidth = options.strokeWidth ?? 2;
+  const strokeWidth = options.strokeWidth ?? 1;
 
   let pathString = '';
   data.forEach((d, index) => {

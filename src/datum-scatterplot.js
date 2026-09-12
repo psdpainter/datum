@@ -1,10 +1,11 @@
-import { Color } from './datum-core.js';
+// src/datum-scatterplot.js
+import { Color, DEFAULT_SERIES_COLORS } from './datum-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const DEFAULT_OPTIONS = {
   radius: 4,
-  fill: Color.Blue,
+  fill: null,
   stroke: '#ffffff',
   strokeWidth: 1,
   opacity: 0.85
@@ -21,8 +22,7 @@ export function scatter(data = [], keysAndOptions = {}) {
     opacity = DEFAULT_OPTIONS.opacity
   } = keysAndOptions;
 
-  // Normalize primitives [10, 20, 30] -> [{ x: 1, y: 10 }, { x: 2, y: 20 }, ...]
-  const normalizedData = data.map((item, index) => {
+  const normalizedData = (data || []).map((item, index) => {
     if (typeof item === 'number') {
       return { [x]: index + 1, [y]: item };
     }
@@ -37,23 +37,24 @@ export function scatter(data = [], keysAndOptions = {}) {
   };
 }
 
-export function renderScatterLayer(layer, context) {
+export function renderScatterLayer(layer, context, layerIndex = 0) {
   const { svg, getX, getY } = context;
   const { data, keys, options } = layer;
 
   if (!data || data.length === 0) return;
 
+  const fallbackColor = DEFAULT_SERIES_COLORS[layerIndex % DEFAULT_SERIES_COLORS.length];
+  const layerFill = options.fill || fallbackColor;
+
   data.forEach((d, index) => {
     const rawX = Number(d[keys.x]);
     const rawY = Number(d[keys.y]);
 
-    // getX handles numeric coordinates if a continuous scale is available,
-    // otherwise falls back to index positioning
     const cx = typeof getX === 'function' ? getX(isNaN(rawX) ? index : rawX, data.length) : 0;
     const cy = typeof getY === 'function' ? getY(isNaN(rawY) ? 0 : rawY) : 0;
 
     const r = typeof options.radius === 'function' ? options.radius(d, index) : options.radius;
-    const fill = typeof options.fill === 'function' ? options.fill(d, index) : options.fill;
+    const fill = typeof layerFill === 'function' ? layerFill(d, index) : layerFill;
 
     const circle = document.createElementNS(SVG_NS, 'circle');
     circle.setAttribute('cx', cx);

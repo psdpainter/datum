@@ -1,7 +1,8 @@
+import { DEFAULT_SERIES_COLORS } from './datum-core.js';
+
+const PALETTE = DEFAULT_SERIES_COLORS;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const FONT_SIZE = 11;
-
-const PALETTE = ['#2563eb', '#06b6d4', '#f97316', '#8b5cf6', '#10b981', '#f43f5e', '#eab308'];
 
 function isBlankColor(color) {
   if (!color || typeof color !== 'string') return true;

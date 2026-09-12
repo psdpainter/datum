@@ -1,108 +1,73 @@
-import { Color } from './datum-core.js';
+import { DEFAULT_SERIES_COLORS } from './datum-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const DEFAULT_OPTIONS = {
-  bins: 10,              // target bin count
-  binRange: null,        // optional explicit [min, max]
-  fill: Color.Blue,
-  stroke: '#ffffff',     // subtle separator between contiguous bins
+  bins: 6,
+  stroke: '#ffffff',
   strokeWidth: 1,
-  opacity: 0.85,
-  rx: 0
+  rx: 2,
+  opacity: 1
 };
 
-// Helper to compute bins from continuous values
-function createHistogramBins(values, binCountTarget, rangeOverride) {
-  if (values.length === 0) return [];
+export function histogram(data = [], keysAndOptions = {}) {
+  const {
+    bins = DEFAULT_OPTIONS.bins,
+    fill,
+    stroke = DEFAULT_OPTIONS.stroke,
+    strokeWidth = DEFAULT_OPTIONS.strokeWidth,
+    rx = DEFAULT_OPTIONS.rx,
+    opacity = DEFAULT_OPTIONS.opacity
+  } = keysAndOptions;
 
-  const minVal = rangeOverride ? rangeOverride[0] : Math.min(...values);
-  const maxVal = rangeOverride ? rangeOverride[1] : Math.max(...values);
-  const span = maxVal - minVal;
+  // Extract raw numbers whether passed as primitives or objects with a value key
+  const values = (data || [])
+    .map(d => (typeof d === 'number' ? d : Number(d.value ?? d.y ?? 0)))
+    .filter(v => !isNaN(v));
 
-  // Protect against uniform datasets
-  const binCount = span === 0 ? 1 : Math.max(1, binCountTarget);
-  const step = span === 0 ? 1 : span / binCount;
+  let binData = [];
+  if (values.length > 0) {
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const rangeVal = max - min || 1;
+    const binSize = rangeVal / bins;
 
-  const bins = [];
-  for (let i = 0; i < binCount; i++) {
-    const x0 = minVal + i * step;
-    const x1 = i === binCount - 1 ? maxVal : x0 + step;
-    bins.push({
-      x0,
-      x1,
-      label: `${Math.round(x0)}–${Math.round(x1)}`,
-      count: 0
+    binData = Array.from({ length: bins }, (_, i) => {
+      const bMin = min + i * binSize;
+      const bMax = bMin + binSize;
+      return {
+        bin: `${Math.round(bMin)}-${Math.round(bMax)}`,
+        count: 0
+      };
+    });
+
+    values.forEach(v => {
+      let bIndex = Math.floor((v - min) / binSize);
+      if (bIndex >= bins) bIndex = bins - 1;
+      binData[bIndex].count++;
     });
   }
 
-  // Populate frequencies
-  values.forEach(v => {
-    if (v < minVal || v > maxVal) return;
-    let placed = false;
-    for (let i = 0; i < bins.length; i++) {
-      const isLast = i === bins.length - 1;
-      if (v >= bins[i].x0 && (isLast ? v <= bins[i].x1 : v < bins[i].x1)) {
-        bins[i].count++;
-        placed = true;
-        break;
-      }
-    }
-  });
-
-  return bins;
-}
-
-// Layer descriptor factory
-export function histogram(data = [], keysAndOptions = {}) {
-  const {
-    value = 'value',
-    bins = DEFAULT_OPTIONS.bins,
-    binRange = DEFAULT_OPTIONS.binRange,
-    fill = DEFAULT_OPTIONS.fill,
-    stroke = DEFAULT_OPTIONS.stroke,
-    strokeWidth = DEFAULT_OPTIONS.strokeWidth,
-    opacity = DEFAULT_OPTIONS.opacity,
-    rx = DEFAULT_OPTIONS.rx
-  } = keysAndOptions;
-
-  // Extract raw numbers from numbers array or objects
-  const rawValues = data
-    .map(item => (typeof item === 'object' && item !== null ? item[value] : item))
-    .map(Number)
-    .filter(v => !isNaN(v));
-
-  // Pre-bin the data into frequency bands
-  const computedBins = createHistogramBins(rawValues, bins, binRange);
-
-  // Format into standard datum items so orchestrator can read categories & values
-  const transformedData = computedBins.map(b => ({
-    binLabel: b.label,
-    frequency: b.count,
-    x0: b.x0,
-    x1: b.x1
-  }));
-
   return {
     type: 'histogram',
-    data: transformedData,
-    keys: { x: 'binLabel', y: 'frequency' },
-    options: { fill, stroke, strokeWidth, opacity, rx }
+    data: binData,
+    keys: { x: 'bin', y: 'count' },
+    options: { bins, fill, stroke, strokeWidth, rx, opacity }
   };
 }
 
-// Layer renderer (called by orchestrator)
-export function renderHistogramLayer(layer, context) {
+export function renderHistogramLayer(layer, context, layerIndex = 0) {
   const { svg, getY, getBand, plotBottom } = context;
   const { data, keys, options } = layer;
 
   if (!data || data.length === 0) return;
 
-  data.forEach((d, index) => {
-    // Histogram bars occupy the full slot (no categorical padding)
-    const band = getBand ? getBand(index) : { x: 0, width: 20 };
-    const rawVal = Number(d[keys.y]) || 0;
+  const fallbackColor = DEFAULT_SERIES_COLORS[layerIndex % DEFAULT_SERIES_COLORS.length];
+  const fillColor = options.fill || fallbackColor;
 
+  data.forEach((d, index) => {
+    const band = getBand(index);
+    const rawVal = Number(d[keys.y]) || 0;
     const yTop = getY(rawVal);
     const rectHeight = Math.max(0, plotBottom - yTop);
 
@@ -111,11 +76,11 @@ export function renderHistogramLayer(layer, context) {
     rect.setAttribute('y', yTop);
     rect.setAttribute('width', Math.max(1, band.width));
     rect.setAttribute('height', rectHeight);
-    rect.setAttribute('fill', options.fill);
-    rect.setAttribute('opacity', options.opacity);
+    rect.setAttribute('fill', fillColor);
     rect.setAttribute('rx', options.rx);
+    rect.setAttribute('opacity', options.opacity);
 
-    if (options.strokeWidth > 0) {
+    if (options.stroke) {
       rect.setAttribute('stroke', options.stroke);
       rect.setAttribute('stroke-width', options.strokeWidth);
     }

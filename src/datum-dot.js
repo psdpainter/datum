@@ -1,12 +1,6 @@
-const SVG_NS = 'http://www.w3.org/2000/svg';
+import { DEFAULT_SERIES_COLORS } from './datum-core.js';
 
-const DEFAULT_DOT_COLORS = [
-  '#1a73e8', // Blue
-  '#12b5cb', // Cyan
-  '#e37400', // Orange
-  '#a142f4', // Purple
-  '#1e8e3e'  // Green
-];
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const DEFAULT_OPTIONS = {
   radius: 4,
@@ -41,7 +35,7 @@ export function renderDotLayer(layer, context, layerIndex = 0) {
   if (!data || data.length === 0) return;
 
   // Fallback to palette color if explicit stroke is not provided
-  const fallbackColor = DEFAULT_DOT_COLORS[layerIndex % DEFAULT_DOT_COLORS.length];
+  const fallbackColor = DEFAULT_SERIES_COLORS[layerIndex % DEFAULT_SERIES_COLORS.length];
   const strokeColor = options.stroke || fallbackColor;
 
   data.forEach((d, index) => {

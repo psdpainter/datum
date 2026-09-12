@@ -5,7 +5,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const DEFAULT_OPTIONS = {
   direction: 'horizontal',
   stroke: Color.Grey,
-  strokeWidth: 1,
+  strokeWidth: 1.5,
   dashed: false,
   dashArray: '4 4'
 };
@@ -39,8 +39,11 @@ export function renderRulerLayer(layer, context) {
   const plotTop = padding.top;
   const plotBottom = height - padding.bottom;
 
-  // Resolve target value from options.value or the first data item
-  const targetVal = options.value ?? (data.length > 0 ? (options.direction === 'vertical' ? data[0][keys.x] : data[0][keys.y]) : null);
+  const targetVal = options.value ?? (
+    data.length > 0
+      ? (options.direction === 'vertical' ? data[0][keys.x] : data[0][keys.y])
+      : null
+  );
 
   if (targetVal == null) return;
 
@@ -48,13 +51,12 @@ export function renderRulerLayer(layer, context) {
   lineEl.setAttribute('stroke', options.stroke);
   lineEl.setAttribute('stroke-width', options.strokeWidth);
 
-  // Apply dashed stroke only when explicitly enabled
   if (options.dashed) {
     lineEl.setAttribute('stroke-dasharray', options.dashArray);
   }
 
   if (options.direction === 'vertical') {
-    const index = categories ? categories.indexOf(targetVal) : -1;
+    const index = categories ? categories.indexOf(String(targetVal)) : -1;
     const xCoord = getX(index >= 0 ? index : 0);
 
     lineEl.setAttribute('x1', xCoord);

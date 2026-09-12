@@ -5,7 +5,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const DEFAULT_OPTIONS = {
   minColor: '#e0f2fe',
-  maxColor: Color.Blue || '#2563eb',
+  maxColor: Color.Blue,
   stroke: '#ffffff',
   strokeWidth: 2,
   rx: 3,
@@ -112,7 +112,8 @@ export function renderHeatmapLayer(layer, context) {
           value: rawVal,
           label: `${d[keys.x]} × ${d[keys.y]}`,
           color: cellColor,
-          formatter: options.tooltip
+          formatter: typeof options.tooltip === 'function' ? options.tooltip : null,
+          tooltipConfig: typeof options.tooltip === 'object' ? options.tooltip : {}
         },
         tooltipController,
         container

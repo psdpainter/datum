@@ -1,20 +1,13 @@
-import { Color } from './datum-core.js';
+// src/datum-bar.js
+import { DEFAULT_SERIES_COLORS } from './datum-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-
-const DEFAULT_BAR_COLORS = [
-  Color.Blue,
-  Color.Cyan,
-  Color.Orange,
-  Color.Purple,
-  Color.Green
-];
 
 const DEFAULT_OPTIONS = {
   fill: null,
   stroke: null,
   strokeWidth: 0,
-  rx: 0,
+  rx: 2,
   opacity: 1
 };
 
@@ -30,8 +23,7 @@ export function bar(data = [], keysAndOptions = {}) {
     stackId = null
   } = keysAndOptions;
 
-  // Normalize primitive number arrays: [0.42, 0.88] -> [{ x: 0, y: 0.42 }, { x: 1, y: 0.88 }]
-  const normalizedData = data.map((item, index) => {
+  const normalizedData = (data || []).map((item, index) => {
     if (typeof item === 'number') {
       return { [x]: index + 1, [y]: item };
     }
@@ -53,7 +45,7 @@ export function renderBarLayer(layer, context, barMeta) {
 
   if (!data || data.length === 0) return;
 
-  const fallbackColor = DEFAULT_BAR_COLORS[barIndex % DEFAULT_BAR_COLORS.length];
+  const fallbackColor = DEFAULT_SERIES_COLORS[barIndex % DEFAULT_SERIES_COLORS.length];
   const fillColor = options.fill || fallbackColor;
 
   data.forEach((d, catIndex) => {

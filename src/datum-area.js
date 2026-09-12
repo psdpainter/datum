@@ -1,14 +1,6 @@
-import { Color, generateGuid } from './datum-core.js';
+import { DEFAULT_SERIES_COLORS, generateGuid } from './datum-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-
-const DEFAULT_AREA_COLORS = [
-  Color.Blue,
-  Color.Cyan,
-  Color.Orange,
-  Color.Purple,
-  Color.Green
-];
 
 const DEFAULT_OPTIONS = {
   opacity: 0.25,
@@ -48,7 +40,8 @@ export function renderAreaLayer(layer, context, layerIndex = 0) {
 
   if (!data || data.length === 0) return;
 
-  const fallbackColor = DEFAULT_AREA_COLORS[layerIndex % DEFAULT_AREA_COLORS.length];
+  // Fallback to shared Material Design series cycle
+  const fallbackColor = DEFAULT_SERIES_COLORS[layerIndex % DEFAULT_SERIES_COLORS.length];
   const fillColor = options.fill || fallbackColor;
   const baselineY = plotBottom !== undefined ? plotBottom : height - padding.bottom;
 
@@ -99,7 +92,7 @@ export function renderAreaLayer(layer, context, layerIndex = 0) {
     pathString += (index === 0 ? 'M' : 'L') + ` ${px} ${py} `;
   });
 
-  // Close the path along the bottom baseline
+  // Close the path down to the baseline
   pathString += `L ${lastX} ${baselineY} L ${firstX} ${baselineY} Z`;
 
   const areaPath = document.createElementNS(SVG_NS, 'path');
@@ -110,6 +103,6 @@ export function renderAreaLayer(layer, context, layerIndex = 0) {
   }
   areaPath.setAttribute('stroke', 'none');
 
-  // Insert before other elements in this layer so it sits behind
+  // Insert before other elements in this layer
   svg.appendChild(areaPath);
 }
