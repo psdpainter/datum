@@ -67,6 +67,10 @@ Datum.chart({
     Datum.line(numbers, {
       stroke: Color.Green,
       strokeWidth: 2
+    }),
+    Datum.area(numbers, {
+      fill: Color.LightGreen,
+      gradient: true
     })
   ]
 });

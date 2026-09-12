@@ -1,14 +1,46 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-export const Color = {
-  Blue: '#2563eb',
-  Cyan: '#06b6d4',
-  Orange: '#f97316',
-  Purple: '#8b5cf6',
-  Green: '#10b981',
-  Red: '#ef4444',
-  Gray: '#6b7280'
-};
+export const Color = Object.freeze({
+  // Blues & Cool Hues
+  Blue: '#2196f3',       // Material Blue 500
+  DarkBlue: '#0d47a1',   // Material Blue 900
+  LightBlue: '#03a9f4',  // Material Light Blue 500
+  Cyan: '#00bcd4',       // Material Cyan 500
+  Teal: '#009688',       // Material Teal 500
+  Indigo: '#3f51b5',     // Material Indigo 500
+
+  // Greens & Natural Tones
+  Green: '#4caf50',      // Material Green 500
+  LightGreen: '#8bc34a', // Material Light Green 500
+
+  // Warms & Accents
+  Amber: '#ffc107',      // Material Amber 500
+  Orange: '#ff9800',     // Material Orange 500
+  DeepOrange: '#ff5722', // Material Deep Orange 500
+  Red: '#f44336',        // Material Red 500
+
+  // Pinks, Purples & Magenta
+  Pink: '#e91e63',       // Material Pink 500
+  Magenta: '#d81b60',    // Material Pink 600 / Magenta
+  Purple: '#9c27b0',     // Material Purple 500
+  DeepPurple: '#673ab7', // Material Deep Purple 500
+
+  // Neutrals & Surfaces
+  Grey: '#9e9e9e',       // Material Grey 500
+  BlueGrey: '#607d8b'    // Material Blue Grey 500
+});
+
+export const DEFAULT_SERIES_COLORS = [
+  Color.Blue,
+  Color.DeepOrange,
+  Color.Green,
+  Color.Magenta,
+  Color.Amber,
+  Color.Purple,
+  Color.Teal,
+  Color.DarkBlue,
+  Color.Pink
+];
 
 export function generateGuid() {
   return 'datum-id-' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);

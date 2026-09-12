@@ -32,11 +32,11 @@ Datum.chart({
   animationDelay: '20ms',
   datum: [
     Datum.line(numbers, {
-      stroke: Color.Green,
+      stroke: Color.Orange,
       strokeWidth: 2
     }),
     Datum.area(numbers, {
-        fill: Color.Purple,
+        fill: Color.Amber,
         gradient: true
     })
   ]
