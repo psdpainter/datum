@@ -25,9 +25,17 @@ export function area(data = [], keysAndOptions = {}) {
     gradient = DEFAULT_OPTIONS.gradient
   } = keysAndOptions;
 
+  // Normalize primitive number arrays: [10, 25, ...] -> [{ x: 1, y: 10 }, { x: 2, y: 25 }, ...]
+  const normalizedData = (data || []).map((item, index) => {
+    if (typeof item === 'number') {
+      return { [x]: index + 1, [y]: item };
+    }
+    return item;
+  });
+
   return {
     type: 'area',
-    data,
+    data: normalizedData,
     keys: { x, y },
     options: { fill, opacity, gradient }
   };
@@ -35,14 +43,14 @@ export function area(data = [], keysAndOptions = {}) {
 
 // Layer renderer (called by orchestrator)
 export function renderAreaLayer(layer, context, layerIndex = 0) {
-  const { svg, getX, getY, height, padding } = context;
+  const { svg, getX, getY, height, padding, plotBottom } = context;
   const { data, keys, options } = layer;
 
   if (!data || data.length === 0) return;
 
   const fallbackColor = DEFAULT_AREA_COLORS[layerIndex % DEFAULT_AREA_COLORS.length];
   const fillColor = options.fill || fallbackColor;
-  const baselineY = height - padding.bottom;
+  const baselineY = plotBottom !== undefined ? plotBottom : height - padding.bottom;
 
   let finalFill = fillColor;
 
@@ -91,7 +99,7 @@ export function renderAreaLayer(layer, context, layerIndex = 0) {
     pathString += (index === 0 ? 'M' : 'L') + ` ${px} ${py} `;
   });
 
-  // Close the path down to the baseline
+  // Close the path along the bottom baseline
   pathString += `L ${lastX} ${baselineY} L ${firstX} ${baselineY} Z`;
 
   const areaPath = document.createElementNS(SVG_NS, 'path');
@@ -102,11 +110,6 @@ export function renderAreaLayer(layer, context, layerIndex = 0) {
   }
   areaPath.setAttribute('stroke', 'none');
 
-  // Insert before visible lines and markers
-  const defs = svg.querySelector('defs');
-  if (defs && defs.nextSibling) {
-    svg.insertBefore(areaPath, defs.nextSibling);
-  } else {
-    svg.insertBefore(areaPath, svg.firstChild);
-  }
+  // Insert before other elements in this layer so it sits behind
+  svg.appendChild(areaPath);
 }

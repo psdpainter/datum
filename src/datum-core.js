@@ -35,13 +35,13 @@ export function createBase(options = {}) {
     container.appendChild(title);
   }
 
-  if (options.subTitle || options.subtitle) {
-    const subTitleText = options.subTitle || options.subtitle;
-    const subTitle = document.createElement('h3');
-    subTitle.className = 'datum-subtitle datum-ff datum-fs-base datum-fw-400 datum-color-muted';
-    subTitle.setAttribute('data-datum-subtitle', '');
-    subTitle.textContent = subTitleText;
-    container.appendChild(subTitle);
+  if (options.subtitle || options.subtitle) {
+    const subtitleText = options.subtitle || options.subtitle;
+    const subtitle = document.createElement('h3');
+    subtitle.className = 'datum-subtitle datum-ff datum-fs-base datum-fw-400 datum-color-muted';
+    subtitle.setAttribute('data-datum-subtitle', '');
+    subtitle.textContent = subtitleText;
+    container.appendChild(subtitle);
   }
 
   let numericWidth = 600;

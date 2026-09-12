@@ -61,6 +61,8 @@ Datum.chart({
   subtitle: 'A line chart using an array of primitive integers',
   width: '100%',
   height: 380,
+  animated: true,
+  animationDelay: '20ms',
   datum: [
     Datum.line(numbers, {
       stroke: Color.Green,
