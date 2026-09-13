@@ -1,6 +1,6 @@
 {
   "name": "@psdpainter/datum-js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Lightweight, data visualization library for enterprise web apps",
   "type": "module",
   "main": "./dist/datum.js",
