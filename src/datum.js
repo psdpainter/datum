@@ -23,6 +23,8 @@ const FONT_SIZE = 11;
 const CHAR_WIDTH_RATIO = 0.62;
 const TICK_LENGTH = 6;
 
+let chartInstanceCounter = 0;
+
 const layerRenderers = {
   line: renderLineLayer,
   dot: renderDotLayer,
@@ -65,40 +67,16 @@ export const Datum = {
     const isTooltipDisabled = options.tooltip === false || config.tooltip === false;
     const tooltipConfig = options.tooltip !== undefined ? options.tooltip : config.tooltip;
 
-    // Animation configuration
     const isAnimated = options.animated === true;
-    let resolvedAxisDelay = '40ms';
-    let resolvedCanvasDelay = '0ms';
+    let resolvedAnimationDelay = '40ms';
 
-    const isValidDelay = (val) => typeof val === 'string' && /^\d+ms$/.test(val);
-
-    if (isAnimated && options.animationDelay !== undefined) {
-      if (typeof options.animationDelay === 'string') {
-        if (isValidDelay(options.animationDelay)) {
-          resolvedAxisDelay = options.animationDelay;
-        } else {
-          console.warn(
-            `Datum: "animationDelay" string must be in milliseconds (e.g. '40ms', '200ms'). Received: "${options.animationDelay}". Falling back to '40ms'.`
-          );
-        }
-      } else if (typeof options.animationDelay === 'object' && options.animationDelay !== null) {
-        const { axis, canvas } = options.animationDelay;
-
-        if (axis !== undefined) {
-          if (isValidDelay(axis)) {
-            resolvedAxisDelay = axis;
-          } else {
-            console.warn(`Datum: animationDelay.axis must be formatted in ms (e.g. '40ms'). Received: "${axis}".`);
-          }
-        }
-
-        if (canvas !== undefined) {
-          if (isValidDelay(canvas)) {
-            resolvedCanvasDelay = canvas;
-          } else {
-            console.warn(`Datum: animationDelay.canvas must be formatted in ms (e.g. '150ms'). Received: "${canvas}".`);
-          }
-        }
+    if (isAnimated) {
+      if (typeof options.animationDelay === 'string' && /^\d+ms$/.test(options.animationDelay)) {
+        resolvedAnimationDelay = options.animationDelay;
+      } else if (options.animationDelay !== undefined) {
+        console.warn(
+          `Datum: "animationDelay" must be a string formatted in milliseconds (e.g. '40ms', '200ms'). Received: "${options.animationDelay}". Falling back to '40ms'.`
+        );
       }
     }
 
@@ -149,20 +127,9 @@ export const Datum = {
         }
       });
 
-      if (primaryLayerWithCategories) {
-        const xKey = primaryLayerWithCategories.keys?.x ?? primaryLayerWithCategories.keys?.label;
-        xCategories = primaryLayerWithCategories.data.map((d, i) => {
-          if (typeof d === 'object' && d !== null && xKey && d[xKey] !== undefined) {
-            return String(d[xKey]);
-          }
-          if (typeof d === 'object' && d !== null && d.x !== undefined) {
-            return String(d.x);
-          }
-          return String(i + 1);
-        });
-      } else {
-        xCategories = [];
-      }
+      xCategories = primaryLayerWithCategories
+        ? primaryLayerWithCategories.data.map(d => String(d[primaryLayerWithCategories.keys.x]))
+        : [];
     }
 
     let allYValues = [];
@@ -272,18 +239,16 @@ export const Datum = {
     const { svg, container, width, height } = base;
     svg.setAttribute('data-datum-chart-type', chartTypes || 'composite');
 
-    // Preserve existing classes and apply animation styles
-    svg.classList.add('datum-chart');
+    const chartClasses = ['datum-chart'];
     if (isAnimated) {
-      svg.classList.add('is-animated');
-      svg.style.setProperty('--datum-axis-delay', resolvedAxisDelay);
-      svg.style.setProperty('--datum-canvas-delay', resolvedCanvasDelay);
+      chartClasses.push('is-animated');
+      svg.style.setProperty('--datum-animation-delay', resolvedAnimationDelay);
       if (container) {
         container.classList.add('is-animated');
-        container.style.setProperty('--datum-axis-delay', resolvedAxisDelay);
-        container.style.setProperty('--datum-canvas-delay', resolvedCanvasDelay);
+        container.style.setProperty('--datum-animation-delay', resolvedAnimationDelay);
       }
     }
+    svg.setAttribute('class', chartClasses.join(' '));
 
     const globalStyleConfig = (typeof tooltipConfig === 'object' && tooltipConfig !== null) ? tooltipConfig : {};
     const tooltipController = !isTooltipDisabled 
@@ -299,17 +264,37 @@ export const Datum = {
     const plotTop = padding.top;
     const plotBottom = height - padding.bottom;
 
+    const instanceId = ++chartInstanceCounter;
+    const clipId = `datum-clip-${instanceId}`;
+
+    if (isAnimated) {
+      let defs = svg.querySelector('defs');
+      if (!defs) {
+        defs = document.createElementNS(SVG_NS, 'defs');
+        svg.insertBefore(defs, svg.firstChild);
+      }
+      const clipPath = document.createElementNS(SVG_NS, 'clipPath');
+      clipPath.setAttribute('id', clipId);
+
+      const clipRect = document.createElementNS(SVG_NS, 'rect');
+      clipRect.setAttribute('class', 'datum-clip-rect');
+      clipRect.setAttribute('x', '0');
+      clipRect.setAttribute('y', '0');
+      clipRect.setAttribute('width', String(plotWidth));
+      clipRect.setAttribute('height', String(plotHeight));
+
+      clipPath.appendChild(clipRect);
+      defs.appendChild(clipPath);
+    }
+
     const hasBandLayer = layers.some(l => l.type === 'bar' || l.type === 'histogram' || l.type === 'candlestick' || l.type === 'heatmap');
 
     const resolveIndex = (keyOrIndex, categoryList) => {
-      if (typeof keyOrIndex === 'number' && keyOrIndex >= 0 && keyOrIndex < categoryList.length) {
-        return keyOrIndex;
-      }
       if (categoryList && categoryList.length > 0) {
         const found = categoryList.indexOf(String(keyOrIndex));
         if (found !== -1) return found;
       }
-      return typeof keyOrIndex === 'number' ? Math.max(0, keyOrIndex) : 0;
+      return typeof keyOrIndex === 'number' ? keyOrIndex : 0;
     };
 
     const getX = (keyOrIndex, totalCount = xCategories.length) => {
@@ -420,10 +405,12 @@ export const Datum = {
         const tickInterval = userInterval || autoInterval;
 
         xCategories.forEach((label, index) => {
-          const isStep = index % tickInterval === 0;
+          const isFirst = index === 0;
           const isLast = index === xCategories.length - 1;
+          const isStep = index % tickInterval === 0;
 
-          if (!isStep && (!isLast || (index % tickInterval === 1))) return;
+          const shouldRender = isFirst || isStep || isLast;
+          if (!shouldRender) return;
 
           const xPos = getX(index, xCategories.length);
           const tickEndY = plotBottom + TICK_LENGTH;
@@ -468,13 +455,14 @@ export const Datum = {
     const stackOffsets = new Array(xCategories.length).fill(0);
     let barIndex = 0;
 
-    // 2. Plot Area Canvas Group (Nested inside CSS animated wrapper when active)
+    // 2. Plot Area Canvas Group
     const plotAreaGroup = document.createElementNS(SVG_NS, 'g');
     plotAreaGroup.setAttribute('class', 'datum-plot-area');
 
     if (isAnimated) {
       const clipWrapperGroup = document.createElementNS(SVG_NS, 'g');
       clipWrapperGroup.setAttribute('class', 'datum-clip-wrapper');
+      clipWrapperGroup.setAttribute('clip-path', `url(#${clipId})`);
       svg.appendChild(clipWrapperGroup);
       clipWrapperGroup.appendChild(plotAreaGroup);
     } else {

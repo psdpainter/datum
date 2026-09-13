@@ -45,3 +45,8 @@ body {
 .main {
   padding: 1rem;
 }
+
+ul.sidebar-list,
+ul.sidebar-list li {
+    list-style-type: none;
+}

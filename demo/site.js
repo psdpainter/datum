@@ -1,4 +1,4 @@
-import { Color, Datum } from './src/datum.js';
+import { Color, Datum } from '../src/datum.js';
 import { 
   ohlcData, 
   salesData, 
@@ -19,11 +19,12 @@ Datum.chart({
   subtitle: 'This is the subtitle',
   config: {
     xAxis: {
-      labelAngle: -45
+      labelAngle: -60
     }
   },
   width: '100%',
   height: 380,
+  animated: true,
   datum: [
     Datum.area(aaplStock, { 
       x: 'day', 
@@ -179,35 +180,6 @@ Datum.chart({
       close: 'close',
       upColor: Color.Green,
       downColor: Color.Red
-    })
-  ]
-});
-
-Datum.chart({
-  target: '#chart',
-  title: 'Traffic by Device',
-  subTitle: 'Q3 Analytics',
-  width: 400,
-  height: 360,
-  datum: [
-    Datum.pie(marketShareData, {
-      name: 'Pie data',
-      value: 'share',
-      label: 'device'
-    })
-  ]
-});
-
-Datum.chart({
-  target: '#chart',
-  title: 'Budget Split',
-  subTitle: 'Donut View',
-  width: 400,
-  height: 360,
-  datum: [
-    Datum.pie(rawDistribution, {
-      innerRadius: 0.6,
-      labelPosition: 'outside'
     })
   ]
 });

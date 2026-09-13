@@ -1,4 +1,4 @@
-import { Color, Datum } from './src/datum.js';
+import { Color, Datum } from '../src/datum.js';
 import { 
   ohlcData, 
   salesData, 
@@ -24,20 +24,21 @@ Datum.chart({
   },
   width: '100%',
   height: 380,
+  animated: true,
   datum: [
     Datum.bar(aaplStock, { 
       x: 'day', 
       y: 'open', 
-      fill: Color.Grey, 
-      opacity: 0.4 
+      fill: Color.Magenta,
+      opacity: 0.5
     }),
   ]
 });
 
 Datum.chart({
   target: '#chart',
-  title: 'This a bar chart',
-  subtitle: 'First example',
+  title: 'Stacked bar chart',
+  subtitle: 'This chart also includes a ruler - a distinct line at a key/value',
   config: {
     xAxis: {
       labelAngle: -45
@@ -45,6 +46,7 @@ Datum.chart({
   },
   width: '100%',
   height: 380,
+  animated: true,
   datum: [
     Datum.bar(salesData, { x: 'quarter', y: 'online', stackId: 'total', fill: Color.Blue }),
     Datum.bar(salesData, { x: 'quarter', y: 'retail', stackId: 'total', fill: Color.Cyan }),
@@ -58,6 +60,7 @@ Datum.chart({
   subTitle: 'Online vs Retail (Grouped)',
   width: '100%',
   height: 380,
+  animated: true,
   datum: [
     Datum.bar(salesData, { x: 'quarter', y: 'online', fill: Color.Blue }),
     Datum.bar(salesData, { x: 'quarter', y: 'retail', fill: Color.Cyan })
@@ -70,12 +73,10 @@ Datum.chart({
   subTitle: 'Sample chart using an array of random integers only',
   width: '100%',
   height: 360,
-  config: {
-    xAxis: { labelAngle: 0 }
-  },
+  animated: true,
   datum: [
     Datum.bar(numbers, {
-      fill: Color.Cyan
+      fill: Color.Amber
     })
   ]
 });

@@ -160,7 +160,6 @@
 
 .datum-legend-item-disabled .datum-legend-text {
   fill: var(--datum-color-disabled) !important;
-  text-decoration: line-through;
 }
 
 /* Crosshair & Overlays */
@@ -261,7 +260,6 @@
 
 /* Animate reveal directly on the wrapper group using inset clip-path */
 .datum-chart.is-animated .datum-clip-wrapper {
-  /* inset(top right bottom left) -> -20px bleed vertically, 100% clipped from right */
   clip-path: inset(-20px 100% -20px 0);
   animation: datum-wipe-reveal 1s ease-in-out forwards;
   animation-delay: var(--datum-canvas-delay, 0.5s);
@@ -273,3 +271,4 @@
     clip-path: inset(-20px 0% -20px 0);
   }
 }
+
