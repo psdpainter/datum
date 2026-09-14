@@ -1,23 +1,61 @@
-import { DEFAULT_SERIES_COLORS, generateGuid } from './datum-core.js';
+import { Color, generateGuid } from './datum-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+const DEFAULT_AREA_COLORS = [
+  Color.Blue,
+  Color.Cyan,
+  Color.Orange,
+  Color.Purple,
+  Color.Green
+];
+
 const DEFAULT_OPTIONS = {
   opacity: 0.25,
-  gradient: false
+  gradient: false,
+  smooth: false,
+  tension: 0.2
 };
 
-// Layer descriptor factory
+// Generates smooth cubic Bezier path coordinates between points
+function buildSmoothPath(points, tension = 0.2) {
+  if (points.length === 0) return '';
+  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+  if (points.length === 2) return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
+
+  let d = `M ${points[0].x} ${points[0].y}`;
+
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i === 0 ? i : i - 1];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2] || p2;
+
+    const cp1x = p1.x + (p2.x - p0.x) * tension;
+    const cp1y = p1.y + (p2.y - p0.y) * tension;
+    const cp2x = p2.x - (p3.x - p1.x) * tension;
+    const cp2y = p2.y - (p3.y - p1.y) * tension;
+
+    d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+  }
+
+  return d;
+}
+
 export function area(data = [], keysAndOptions = {}) {
   const {
     x = 'x',
     y = 'y',
     fill,
     opacity = DEFAULT_OPTIONS.opacity,
-    gradient = DEFAULT_OPTIONS.gradient
+    gradient = DEFAULT_OPTIONS.gradient,
+    smooth = DEFAULT_OPTIONS.smooth,
+    tension = DEFAULT_OPTIONS.tension,
+    name,
+    tooltip
   } = keysAndOptions;
 
-  // Normalize primitive number arrays: [10, 25, ...] -> [{ x: 1, y: 10 }, { x: 2, y: 25 }, ...]
+  // Normalize primitive numeric arrays: [10, 20] -> [{ x: 1, y: 10 }, { x: 2, y: 20 }]
   const normalizedData = (data || []).map((item, index) => {
     if (typeof item === 'number') {
       return { [x]: index + 1, [y]: item };
@@ -29,25 +67,23 @@ export function area(data = [], keysAndOptions = {}) {
     type: 'area',
     data: normalizedData,
     keys: { x, y },
-    options: { fill, opacity, gradient }
+    options: { fill, opacity, gradient, smooth, tension, name, tooltip }
   };
 }
 
-// Layer renderer (called by orchestrator)
 export function renderAreaLayer(layer, context, layerIndex = 0) {
-  const { svg, getX, getY, height, padding, plotBottom } = context;
+  const { svg, getX, getY, height, padding } = context;
   const { data, keys, options } = layer;
 
   if (!data || data.length === 0) return;
 
-  // Fallback to shared Material Design series cycle
-  const fallbackColor = DEFAULT_SERIES_COLORS[layerIndex % DEFAULT_SERIES_COLORS.length];
+  const fallbackColor = DEFAULT_AREA_COLORS[layerIndex % DEFAULT_AREA_COLORS.length];
   const fillColor = options.fill || fallbackColor;
-  const baselineY = plotBottom !== undefined ? plotBottom : height - padding.bottom;
+  const baselineY = height - padding.bottom;
 
   let finalFill = fillColor;
 
-  // 1. Conditionally inject <linearGradient> if gradient: true
+  // 1. Dynamic SVG linearGradient injection
   if (options.gradient === true) {
     let defs = svg.querySelector('defs');
     if (!defs) {
@@ -63,14 +99,12 @@ export function renderAreaLayer(layer, context, layerIndex = 0) {
     linearGradient.setAttribute('x2', '0%');
     linearGradient.setAttribute('y2', '100%');
 
-    // Top stop: defined color and opacity
     const stopTop = document.createElementNS(SVG_NS, 'stop');
     stopTop.setAttribute('offset', '0%');
     stopTop.setAttribute('stop-color', fillColor);
     stopTop.setAttribute('stop-opacity', options.opacity);
     linearGradient.appendChild(stopTop);
 
-    // Bottom stop: fade to zero opacity
     const stopBottom = document.createElementNS(SVG_NS, 'stop');
     stopBottom.setAttribute('offset', '100%');
     stopBottom.setAttribute('stop-color', fillColor);
@@ -81,19 +115,27 @@ export function renderAreaLayer(layer, context, layerIndex = 0) {
     finalFill = `url(#${gradientId})`;
   }
 
-  // 2. Build the path geometry
-  let pathString = '';
-  const firstX = getX(0, data.length);
-  const lastX = getX(data.length - 1, data.length);
+  // 2. Build coordinate points
+  const points = data.map((d, index) => ({
+    x: getX(index, data.length),
+    y: getY(Number(d[keys.y]) || 0)
+  }));
 
-  data.forEach((d, index) => {
-    const px = getX(index, data.length);
-    const py = getY(Number(d[keys.y]) || 0);
-    pathString += (index === 0 ? 'M' : 'L') + ` ${px} ${py} `;
-  });
+  const firstX = points[0].x;
+  const lastX = points[points.length - 1].x;
 
-  // Close the path down to the baseline
-  pathString += `L ${lastX} ${baselineY} L ${firstX} ${baselineY} Z`;
+  // 3. Build top boundary path (smooth bezier or linear segments)
+  let topPathString = '';
+  if (options.smooth) {
+    topPathString = buildSmoothPath(points, options.tension);
+  } else {
+    points.forEach((pt, index) => {
+      topPathString += (index === 0 ? 'M' : ' L') + ` ${pt.x} ${pt.y}`;
+    });
+  }
+
+  // 4. Close path down to the baseline axis
+  const pathString = `${topPathString} L ${lastX} ${baselineY} L ${firstX} ${baselineY} Z`;
 
   const areaPath = document.createElementNS(SVG_NS, 'path');
   areaPath.setAttribute('d', pathString.trim());
@@ -103,6 +145,11 @@ export function renderAreaLayer(layer, context, layerIndex = 0) {
   }
   areaPath.setAttribute('stroke', 'none');
 
-  // Insert before other elements in this layer
-  svg.appendChild(areaPath);
+  // Keep areas behind overlay marks
+  const defs = svg.querySelector('defs');
+  if (defs && defs.nextSibling) {
+    svg.insertBefore(areaPath, defs.nextSibling);
+  } else {
+    svg.insertBefore(areaPath, svg.firstChild);
+  }
 }

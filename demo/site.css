@@ -15,6 +15,14 @@ body {
   overflow-x: hidden;
 }
 
+a {
+  text-decoration: none;
+}
+
+a:visited {
+  color: initial;
+}
+
 .container {
   height: 100%;
 }
@@ -46,7 +54,26 @@ body {
   padding: 1rem;
 }
 
+ul.sidebar-list {
+  margin-block: 1rem;
+}
+
 ul.sidebar-list,
 ul.sidebar-list li {
     list-style-type: none;
+}
+
+ul.sidebar-list li {
+  margin-block: 0.25rem;
+}
+
+ul.sidebar-list li a {
+    display: flex;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.125rem;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+ul.sidebar-list li a:hover {
+    background-color: #e0e0e0;
 }

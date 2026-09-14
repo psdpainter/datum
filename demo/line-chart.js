@@ -36,7 +36,29 @@ Datum.chart({
       strokeWidth: 2
     }),
     Datum.area(numbers, {
+        gradient: true, 
         fill: Color.Amber,
+        gradient: true
+    })
+  ]
+});
+
+Datum.chart({
+  target: '#chart',
+  title: 'Line chart (smoothed)',
+  subtitle: 'A line chart using an array of primitive integers but with smoothing enabled',
+  width: '100%',
+  height: 500,
+  animated: true,
+  datum: [
+    Datum.line(numbers, {
+      smooth: true,
+      stroke: Color.Green,
+      strokeWidth: 2
+    }),
+    Datum.area(numbers, {
+        smooth: true,
+        fill: Color.BlueGrey,
         gradient: true
     })
   ]

@@ -8,10 +8,17 @@ class DemoLayout extends HTMLElement {
                     <h1>Datum</h1>
                     <ul class="sidebar-list">
                         <li><a href="/demo">Home</a></li>
-                        <li><a href="/demo/bar-chart.html">Bar chart</a></li>
-                        <li><a href="/demo/line-chart.html">Line chart</a></li>
-                        <li><a href="/demo/candlestick-chart.html">Candlestick chart</a></li>
-                        <li><a href="/demo/pie-chart.html">Pie chart</a></li>
+                        <li><a href="/demo/area-chart.html">Area</a></li>
+                        <li><a href="/demo/bar-chart.html">Bar</a></li>
+                        <li><a href="/demo/histogram-chart.html">Histogram</a></li>
+                        <li><a href="/demo/line-chart.html">Line</a></li>
+                        <li><a href="/demo/candlestick-chart.html">Candlestick</a></li>
+                        <li><a href="/demo/pie-chart.html">Pie</a></li>
+                        <li><a href="/demo/dot-chart.html">Dot</a></li>
+                        <li><a href="/demo/scatterplot-chart.html">Scatterplot</a></li>
+                        <li><a href="/demo/heatmap-chart.html">Heatmap</a></li>
+                        <li><a href="/demo/range-chart.html">Range</a></li>
+                        <li><a href="/demo/waffle-chart.html">Waffle</a></li>
                     </ul>
                 </aside>
                 <div class="main-wrapper">
