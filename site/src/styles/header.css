@@ -1,0 +1,132 @@
+.site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+
+        height: var(--header-height);
+
+        background: rgb(255 255 255 / 0.9);
+        border-bottom: 1px solid var(--color-border);
+
+        backdrop-filter: blur(12px);
+    }
+
+    .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        height: 100%;
+    }
+
+
+    /* Brand */
+
+    .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+    }
+
+    .brand-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: -0.035em;
+    }
+
+    .brand-mark {
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+
+        width: 24px;
+        height: 24px;
+
+        overflow: hidden;
+
+        border-radius: 5px;
+    }
+
+    .brand-mark span {
+        flex: 1;
+        border-radius: 1px 1px 0 0;
+    }
+
+    .brand-mark span:nth-child(1) {
+        height: 55%;
+        background: #4285f4;
+    }
+
+    .brand-mark span:nth-child(2) {
+        height: 82%;
+        background: #ea4335;
+    }
+
+    .brand-mark span:nth-child(3) {
+        height: 68%;
+        background: #fbbc05;
+    }
+
+    .brand-mark span:nth-child(4) {
+        height: 100%;
+        background: #34a853;
+    }
+
+
+    /* Navigation */
+
+    .site-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .nav-link,
+    .github-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+
+        padding: 0.45rem 0.7rem;
+
+        color: var(--color-text-secondary);
+
+        border-radius: var(--radius-sm);
+
+        font-size: 0.9rem;
+        font-weight: 500;
+
+        transition:
+            color 120ms ease,
+            background-color 120ms ease;
+    }
+
+    .nav-link:hover,
+    .github-link:hover {
+        color: var(--color-text);
+        background: var(--color-surface);
+    }
+
+    .nav-link.active {
+        color: var(--color-text);
+        font-weight: 600;
+    }
+
+    .github-link {
+        margin-left: 0.5rem;
+        padding-left: 1rem;
+
+        border-left: 1px solid var(--color-border);
+        border-radius: 0;
+    }
+
+
+    @media (max-width: 640px) {
+        .nav-link {
+            display: none;
+        }
+
+        .github-link {
+            border-left: 0;
+        }
+    }

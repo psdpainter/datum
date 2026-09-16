@@ -1,0 +1,197 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-range.js?raw';
+---
+
+<DocsLayout
+    title="Range"
+    description="Visualize the area between minimum and maximum values with range layers in Datum."
+>
+    <h1>Range</h1>
+
+    <p class="docs-lead">
+        Range layers display the area between a lower and upper value,
+        making them useful for visualizing intervals, uncertainty,
+        forecasts, tolerances, and value bands.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Pass an array of objects to <code>Datum.range()</code>
+            and identify the properties containing the lower and
+            upper values.
+        </p>
+
+        <DatumDemo
+            id="range-example"
+            title="Range"
+            description="A range of minimum and maximum values displayed as a continuous band."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.range(data, {
+    x,
+    yMin,
+    yMax,
+    fill,
+    opacity,
+    stroke,
+    strokeWidth
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data</h2>
+
+        <p>
+            By default, Datum expects each data point to contain
+            <code>x</code>, <code>yMin</code>, and <code>yMax</code>
+            properties.
+        </p>
+
+        <pre><code>{`const values = [
+    { x: 1, yMin: 42, yMax: 68 },
+    { x: 2, yMin: 48, yMax: 74 },
+    { x: 3, yMin: 51, yMax: 79 },
+    { x: 4, yMin: 46, yMax: 72 }
+];
+
+Datum.range(values);`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data keys</h2>
+
+        <p>
+            Use <code>x</code>, <code>yMin</code>, and
+            <code>yMax</code> to map custom property names.
+        </p>
+
+        <pre><code>{`const values = [
+    { month: 1, low: 42, high: 68 },
+    { month: 2, low: 48, high: 74 },
+    { month: 3, low: 51, high: 79 }
+];
+
+Datum.range(values, {
+    x: 'month',
+    yMin: 'low',
+    yMax: 'high'
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Tuple data</h2>
+
+        <p>
+            Range layers also accept arrays containing the minimum
+            and maximum value for each point.
+        </p>
+
+        <pre><code>{`const values = [
+    [42, 68],
+    [48, 74],
+    [51, 79],
+    [46, 72]
+];
+
+Datum.range(values);`}</code></pre>
+
+        <p>
+            Datum automatically assigns sequential X positions
+            beginning with <code>1</code>.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Fill</h2>
+
+        <p>
+            Use <code>fill</code> to control the color of the
+            range area.
+        </p>
+
+        <pre><code>{`Datum.range(values, {
+    fill: Color.Blue
+});`}</code></pre>
+
+        <p>
+            When no fill is provided, Datum uses the default series
+            color for the layer.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Opacity</h2>
+
+        <p>
+            Use <code>opacity</code> to control the transparency
+            of the range.
+        </p>
+
+        <pre><code>{`Datum.range(values, {
+    fill: Color.Blue,
+    opacity: 0.25
+});`}</code></pre>
+
+        <p>
+            The default opacity is <code>0.25</code>.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Stroke</h2>
+
+        <p>
+            A border can be drawn around the range using
+            <code>stroke</code> and <code>strokeWidth</code>.
+        </p>
+
+        <pre><code>{`Datum.range(values, {
+    fill: Color.Blue,
+    opacity: 0.25,
+    stroke: Color.Blue,
+    strokeWidth: 2
+});`}</code></pre>
+
+        <p>
+            By default, range layers do not render a stroke.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    x: 'x',
+    yMin: 'yMin',
+    yMax: 'yMax',
+    fill: undefined,
+    opacity: 0.25,
+    stroke: null,
+    strokeWidth: 0
+}`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-range.js';
+</script>

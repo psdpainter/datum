@@ -1,0 +1,194 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-ruler.js?raw';
+---
+
+<DocsLayout
+    title="Ruler"
+    description="Add horizontal and vertical reference lines to Datum charts."
+>
+    <h1>Ruler</h1>
+
+    <p class="docs-lead">
+        Ruler layers add reference lines to a chart. Use them to highlight
+        targets, thresholds, averages, limits or other significant values
+        alongside your data.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Create a ruler with <code>Datum.ruler()</code> and provide
+            the reference value using <code>value</code>.
+        </p>
+
+        <DatumDemo
+            id="ruler-example"
+            title="Reference line"
+            description="A horizontal ruler marks a reference value of 25."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.ruler(data, {
+    direction,
+    value,
+    stroke,
+    strokeWidth,
+    dashed,
+    dashArray
+});`}</code></pre>
+
+        <p>
+            Rulers generally do not require their own dataset, so an
+            empty array can be passed as the first argument.
+        </p>
+
+        <pre><code>{`Datum.ruler([], {
+    value: 25
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Horizontal rulers</h2>
+
+        <p>
+            Rulers are horizontal by default. The supplied
+            <code>value</code> is positioned against the chart's Y scale
+            and the line extends across the plot area.
+        </p>
+
+        <pre><code>{`Datum.ruler([], {
+    value: 25,
+    stroke: Color.Red
+});`}</code></pre>
+
+        <p>
+            You can also explicitly specify the horizontal direction.
+        </p>
+
+        <pre><code>{`Datum.ruler([], {
+    direction: 'horizontal',
+    value: 25
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Vertical rulers</h2>
+
+        <p>
+            Set <code>direction</code> to <code>'vertical'</code> to
+            draw a reference line along the X axis.
+        </p>
+
+        <pre><code>{`Datum.ruler([], {
+    direction: 'vertical',
+    value: 3,
+    stroke: Color.Red
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Stroke</h2>
+
+        <p>
+            Use <code>stroke</code> to control the ruler color and
+            <code>strokeWidth</code> to control its thickness.
+        </p>
+
+        <pre><code>{`Datum.ruler([], {
+    value: 25,
+    stroke: Color.Red,
+    strokeWidth: 2
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Dashed rulers</h2>
+
+        <p>
+            Set <code>dashed</code> to <code>true</code> to display
+            the ruler as a dashed line.
+        </p>
+
+        <pre><code>{`Datum.ruler([], {
+    value: 25,
+    stroke: Color.Red,
+    dashed: true
+});`}</code></pre>
+
+        <p>
+            The dash pattern can be customized using
+            <code>dashArray</code>.
+        </p>
+
+        <pre><code>{`Datum.ruler([], {
+    value: 25,
+    dashed: true,
+    dashArray: '8 4'
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    direction: 'horizontal',
+    value: 0,
+    stroke: '#9ca3af',
+    strokeWidth: 1.5,
+    dashed: false,
+    dashArray: '4 4'
+}`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Composing with other layers</h2>
+
+        <p>
+            Rulers are most useful when composed with data layers.
+            For example, a ruler can indicate a target value across
+            a line chart.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    datum: [
+        Datum.line(values, {
+            stroke: Color.Blue
+        }),
+
+        Datum.dot(values, {
+            stroke: Color.Blue,
+            fill: '#ffffff'
+        }),
+
+        Datum.ruler([], {
+            value: 25,
+            stroke: Color.Red,
+            dashed: true
+        })
+    ]
+});`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-ruler.js';
+</script>

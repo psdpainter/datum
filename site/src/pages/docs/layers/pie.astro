@@ -1,0 +1,245 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-pie.js?raw';
+---
+
+<DocsLayout
+    title="Pie"
+    description="Visualize proportional data with pie and donut layers in Datum."
+>
+    <h1>Pie</h1>
+
+    <p class="docs-lead">
+        Pie layers display values as proportional slices of a circle,
+        making them useful for showing how individual categories
+        contribute to a whole.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Pass an array of objects to <code>Datum.pie()</code>
+            and identify the properties containing the label and value.
+        </p>
+
+        <DatumDemo
+            id="pie-example"
+            title="Pie"
+            description="A collection of categories rendered as proportional slices."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.pie(data, {
+    label,
+    value,
+    innerRadius,
+    stroke,
+    strokeWidth,
+    opacity,
+    colors,
+    showLabels,
+    labelPosition,
+    tooltip
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data</h2>
+
+        <p>
+            By default, Datum expects each item to contain
+            <code>label</code> and <code>value</code> properties.
+        </p>
+
+        <pre><code>{`const values = [
+    { label: 'Desktop', value: 48 },
+    { label: 'Mobile', value: 32 },
+    { label: 'Tablet', value: 14 },
+    { label: 'Other', value: 6 }
+];
+
+Datum.pie(values);`}</code></pre>
+
+        <p>
+            Primitive numeric arrays are also supported.
+        </p>
+
+        <pre><code>{`Datum.pie([48, 32, 14, 6]);`}</code></pre>
+
+        <p>
+            Numeric values are automatically assigned labels beginning
+            with <code>'1'</code>.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data keys</h2>
+
+        <p>
+            Use <code>label</code> and <code>value</code> to map custom
+            property names.
+        </p>
+
+        <pre><code>{`const values = [
+    { category: 'Desktop', amount: 48 },
+    { category: 'Mobile', amount: 32 },
+    { category: 'Tablet', amount: 14 }
+];
+
+Datum.pie(values, {
+    label: 'category',
+    value: 'amount'
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Donut charts</h2>
+
+        <p>
+            Use <code>innerRadius</code> to create a donut chart.
+            Values below <code>1</code> are interpreted as a proportion
+            of the outer radius.
+        </p>
+
+        <pre><code>{`Datum.pie(values, {
+    innerRadius: 0.6
+});`}</code></pre>
+
+        <p>
+            An absolute pixel value can also be used.
+        </p>
+
+        <pre><code>{`Datum.pie(values, {
+    innerRadius: 60
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Colors</h2>
+
+        <p>
+            Use <code>colors</code> to provide the sequence of colors
+            used to render slices.
+        </p>
+
+        <pre><code>{`Datum.pie(values, {
+    colors: [
+        Color.Blue,
+        Color.Green,
+        Color.Orange,
+        Color.Red
+    ]
+});`}</code></pre>
+
+        <p>
+            If there are more slices than colors, Datum repeats the
+            color sequence.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Labels</h2>
+
+        <p>
+            Percentage labels are displayed on slices by default.
+            Use <code>showLabels</code> to disable them.
+        </p>
+
+        <pre><code>{`Datum.pie(values, {
+    showLabels: false
+});`}</code></pre>
+
+        <p>
+            Use <code>labelPosition</code> to position labels inside
+            or outside the pie.
+        </p>
+
+        <pre><code>{`Datum.pie(values, {
+    labelPosition: 'outside'
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Stroke</h2>
+
+        <p>
+            Use <code>stroke</code> and <code>strokeWidth</code> to
+            style the boundaries between slices.
+        </p>
+
+        <pre><code>{`Datum.pie(values, {
+    stroke: '#ffffff',
+    strokeWidth: 2
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Opacity</h2>
+
+        <p>
+            Use <code>opacity</code> to control the transparency of
+            the slices. The default is <code>1</code>.
+        </p>
+
+        <pre><code>{`Datum.pie(values, {
+    opacity: 0.7
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Tooltips</h2>
+
+        <p>
+            Pie slices support discrete tooltips containing the slice
+            label, value, and percentage.
+        </p>
+
+        <p>
+            Tooltips can be disabled for the layer with
+            <code>tooltip: false</code>.
+        </p>
+
+        <pre><code>{`Datum.pie(values, {
+    tooltip: false
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    label: 'label',
+    value: 'value',
+    innerRadius: 0,
+    stroke: '#ffffff',
+    strokeWidth: 2,
+    opacity: 1,
+    colors: DEFAULT_SERIES_COLORS,
+    showLabels: true,
+    labelPosition: 'inside'
+}`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-pie.js';
+</script>

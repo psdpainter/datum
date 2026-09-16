@@ -1,0 +1,83 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import DatumDemo from '../../components/DatumDemo.astro';
+import exampleCode from '../../examples/introduction.js?raw';
+
+const exampleCode = `import { Datum, Color } from '@psdpainter/datum-js';
+
+const values = [
+    14, 8, 24, 7, 10, 18,
+    15, 2, 6, 16, 18, 28
+];
+
+Datum.chart({
+    target: '#getting-started-chart',
+    height: 300,
+
+    datum: [
+        Datum.area(values, {
+            fill: Color.LightGreen,
+            opacity: 0.3
+        }),
+
+        Datum.line(values, {
+            stroke: Color.Green,
+            strokeWidth: 2
+        }),
+
+        Datum.dot(values, {
+            stroke: Color.Green,
+            fill: '#ffffff',
+            radius: 4
+        })
+    ]
+});`;
+---
+
+<DocsLayout
+    title="Introduction"
+    description="Get started building data visualizations with Datum."
+>
+    <h1>Introduction</h1>
+
+    <p class="docs-lead">
+        Datum is a lightweight JavaScript library for building
+        composable data visualizations without bringing a large
+        framework or dependency tree into your application.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Build with layers</h2>
+
+        <p>
+            A Datum chart can combine multiple visualization layers
+            over the same data. An area, line and collection of dots,
+            for example, can work together as a single visualization.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+
+        <DatumDemo
+            id="getting-started-chart"
+            title="Layer composition"
+            description="An area, line and dot layer rendered over the same values."
+            code={exampleCode}
+        />
+
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Install Datum</h2>
+
+        <pre><code>npm install @psdpainter/datum-js</code></pre>
+    </section>
+
+</DocsLayout>
+
+<script>
+    import '../../examples/introduction.js';
+</script>

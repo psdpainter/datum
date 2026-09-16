@@ -1,0 +1,108 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import DatumDemo from '../../components/DatumDemo.astro';
+import exampleCode from '../../examples/quick-start.js?raw';
+
+const exampleCode = `import { Datum, Color } from '@psdpainter/datum-js';
+import '@psdpainter/datum-js/style';
+
+const values = [
+    12, 18, 14, 24, 20, 28, 25
+];
+
+Datum.chart({
+    target: '#quick-start-chart',
+    height: 300,
+
+    datum: [
+        Datum.line(values, {
+            stroke: Color.Blue,
+            strokeWidth: 2
+        }),
+
+        Datum.dot(values, {
+            stroke: Color.Blue,
+            fill: '#ffffff',
+            radius: 4
+        })
+    ]
+});`;
+---
+
+<DocsLayout
+    title="Quick Start"
+    description="Create your first data visualization with Datum."
+>
+    <h1>Quick Start</h1>
+
+    <p class="docs-lead">
+        Create your first Datum visualization with a few values
+        and a pair of composable layers.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>1. Add a chart container</h2>
+
+        <p>
+            Start with an element where Datum can render the
+            visualization.
+        </p>
+
+        <pre><code>{`<div id="chart"></div>`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>2. Define your data</h2>
+
+        <p>
+            Datum can work directly with an array of primitive
+            numeric values.
+        </p>
+
+        <pre><code>{`const values = [
+    12, 18, 14, 24, 20, 28, 25
+];`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>3. Compose the visualization</h2>
+
+        <p>
+            Pass layers to <code>Datum.chart()</code> using the
+            <code>datum</code> collection. Here, the same values
+            are represented by both a line and dots.
+        </p>
+
+        <DatumDemo
+            id="quick-start-chart"
+            title="Your first Datum chart"
+            description="A line and dot layer composed over the same values."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>How it works</h2>
+
+        <p>
+            <code>Datum.chart()</code> creates the chart surface.
+            Each item in <code>datum</code> describes a visualization
+            layer rendered within that shared chart.
+        </p>
+
+        <p>
+            Because the line and dot layers receive the same values,
+            they share the same coordinate system and appear together
+            as one visualization.
+        </p>
+    </section>
+
+</DocsLayout>
+
+<script>
+    import '../../examples/quick-start.js';
+</script>

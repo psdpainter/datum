@@ -112,7 +112,9 @@ export function setupCrosshairOverlay(context) {
     layers,
     xCategories,
     getX,
+    getNumericX,
     getY,
+    isScatterOnly,
     plotLeft,
     plotRight,
     plotTop,
@@ -170,25 +172,69 @@ export function setupCrosshairOverlay(context) {
       return;
     }
 
+    // const total = xCategories.length;
+    // let closestIndex = 0;
+    // let minDistance = Infinity;
+
+    // for (let i = 0; i < total; i++) {
+    //   const cx = getX(i, total);
+    //   const dist = Math.abs(coords.x - cx);
+    //   if (dist < minDistance) {
+    //     minDistance = dist;
+    //     closestIndex = i;
+    //   }
+    // }
+
+    // const slotWidth = plotWidth / (total || 1);
+    // if (coords.x >= plotRight - slotWidth / 2) {
+    //   closestIndex = total - 1;
+    // }
+
+    // const snapX = getX(closestIndex, total);
     const total = xCategories.length;
     let closestIndex = 0;
     let minDistance = Infinity;
 
+    const scatterLayer = isScatterOnly
+      ? layers.find(layer => layer.type === 'scatter')
+      : null;
+
+    const getSnapX = (index) => {
+      if (
+        isScatterOnly &&
+        scatterLayer &&
+        typeof getNumericX === 'function'
+      ) {
+        const datum = scatterLayer.data?.[index];
+        const rawX = Number(datum?.[scatterLayer.keys.x]);
+
+        if (Number.isFinite(rawX)) {
+          return getNumericX(rawX);
+        }
+      }
+
+      return getX(index, total);
+    };
+
     for (let i = 0; i < total; i++) {
-      const cx = getX(i, total);
+      const cx = getSnapX(i);
       const dist = Math.abs(coords.x - cx);
+
       if (dist < minDistance) {
         minDistance = dist;
         closestIndex = i;
       }
     }
 
-    const slotWidth = plotWidth / (total || 1);
-    if (coords.x >= plotRight - slotWidth / 2) {
-      closestIndex = total - 1;
+    if (!isScatterOnly) {
+      const slotWidth = plotWidth / (total || 1);
+
+      if (coords.x >= plotRight - slotWidth / 2) {
+        closestIndex = total - 1;
+      }
     }
 
-    const snapX = getX(closestIndex, total);
+    const snapX = getSnapX(closestIndex);
     const categoryTitle = xCategories[closestIndex] ?? '';
 
     const slicePoints = [];

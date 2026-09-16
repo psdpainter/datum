@@ -5,7 +5,7 @@ import { area, renderAreaLayer } from './datum-area.js';
 import { ruler, renderRulerLayer } from './datum-ruler.js';
 import { bar, renderBarLayer } from './datum-bar.js';
 import { histogram, renderHistogramLayer } from './datum-histogram.js';
-import { scatter, renderScatterLayer } from './datum-scatterplot.js';
+import { scatter, renderScatterLayer } from './datum-scatter.js';
 import { candlestick, renderCandlestickLayer } from './datum-candlestick.js';
 import { pie, renderPieLayer } from './datum-pie.js';
 import { range, renderRangeLayer } from './datum-range.js';
@@ -290,11 +290,16 @@ export const Datum = {
     const hasBandLayer = layers.some(l => l.type === 'bar' || l.type === 'histogram' || l.type === 'candlestick' || l.type === 'heatmap');
 
     const resolveIndex = (keyOrIndex, categoryList) => {
+      if (typeof keyOrIndex === 'number') {
+        return keyOrIndex;
+      }
+
       if (categoryList && categoryList.length > 0) {
         const found = categoryList.indexOf(String(keyOrIndex));
         if (found !== -1) return found;
       }
-      return typeof keyOrIndex === 'number' ? keyOrIndex : 0;
+
+      return 0;
     };
 
     const getX = (keyOrIndex, totalCount = xCategories.length) => {
@@ -305,6 +310,34 @@ export const Datum = {
       }
       if (totalCount <= 1) return plotLeft + plotWidth / 2;
       return plotLeft + (idx / (totalCount - 1)) * plotWidth;
+    };
+
+    const scatterLayers = layers.filter(
+        layer => layer.type === 'scatter'
+    );
+
+    const isScatterOnly =
+      scatterLayers.length > 0 &&
+      layers.every(layer => layer.type === 'scatter');
+
+    const scatterXValues = scatterLayers.flatMap(layer =>
+        layer.data
+            .map(d => Number(d[layer.keys.x]))
+            .filter(Number.isFinite)
+    );
+
+    const minX = scatterXValues.length
+        ? Math.min(...scatterXValues)
+        : 0;
+
+    const maxX = scatterXValues.length
+        ? Math.max(...scatterXValues)
+        : 1;
+
+    const getNumericX = (value) => {
+        const ratio = (value - minX) / (maxX - minX || 1);
+
+        return plotLeft + ratio * plotWidth;
     };
 
     const getBand = (keyOrIndex, totalCount = xCategories.length) => {
@@ -391,17 +424,79 @@ export const Datum = {
       xAxisLine.setAttribute('y2', plotBottom);
       xAxisGroup.appendChild(xAxisLine);
 
+      // if (xCategories.length > 0) {
+      //   const avgCharWidth = FONT_SIZE * CHAR_WIDTH_RATIO;
+      //   let estimatedWidth = Math.max(20, maxXCharLength * avgCharWidth);
+      //   if (labelAngle !== 0) {
+      //     const angleRad = Math.abs(labelAngle) * (Math.PI / 180);
+      //     estimatedWidth = Math.cos(angleRad) * estimatedWidth + 14;
+      //   }
+
+      //   const safetyMargin = 12;
+      //   const maxFittingLabels = Math.max(1, Math.floor(plotWidth / (estimatedWidth + safetyMargin)));
+      //   const autoInterval = Math.max(1, Math.ceil(xCategories.length / maxFittingLabels));
+      //   const tickInterval = userInterval || autoInterval;
+
+      //   xCategories.forEach((label, index) => {
+      //     const isFirst = index === 0;
+      //     const isLast = index === xCategories.length - 1;
+      //     const isStep = index % tickInterval === 0;
+
+      //     const shouldRender = isFirst || isStep || isLast;
+      //     if (!shouldRender) return;
+
+      //     const xPos = getX(index, xCategories.length);
+      //     const tickEndY = plotBottom + TICK_LENGTH;
+
+      //     const tick = document.createElementNS(SVG_NS, 'line');
+      //     tick.setAttribute('class', 'datum-axis-tick');
+      //     tick.setAttribute('x1', xPos);
+      //     tick.setAttribute('x2', xPos);
+      //     tick.setAttribute('y1', plotBottom);
+      //     tick.setAttribute('y2', tickEndY);
+      //     xAxisGroup.appendChild(tick);
+
+      //     const labelY = tickEndY + 8;
+      //     const xLabel = document.createElementNS(SVG_NS, 'text');
+      //     xLabel.setAttribute('class', 'datum-axis-label datum-axis-text datum-axis-text-x datum-ff datum-fs-sm datum-fw-400 datum-color-muted');
+      //     xLabel.setAttribute('x', xPos);
+      //     xLabel.setAttribute('y', labelY);
+
+      //     if (labelAngle === 0) {
+      //       xLabel.setAttribute('text-anchor', 'middle');
+      //     } else if (labelAngle < 0) {
+      //       xLabel.setAttribute('text-anchor', 'end');
+      //       xLabel.setAttribute('transform', `rotate(${labelAngle}, ${xPos}, ${labelY})`);
+      //     } else {
+      //       xLabel.setAttribute('text-anchor', 'start');
+      //       xLabel.setAttribute('transform', `rotate(${labelAngle}, ${xPos}, ${labelY})`);
+      //     }
+
+      //     xLabel.textContent = label;
+      //     xAxisGroup.appendChild(xLabel);
+      //   });
+      // }
+
       if (xCategories.length > 0) {
         const avgCharWidth = FONT_SIZE * CHAR_WIDTH_RATIO;
         let estimatedWidth = Math.max(20, maxXCharLength * avgCharWidth);
+
         if (labelAngle !== 0) {
           const angleRad = Math.abs(labelAngle) * (Math.PI / 180);
           estimatedWidth = Math.cos(angleRad) * estimatedWidth + 14;
         }
 
         const safetyMargin = 12;
-        const maxFittingLabels = Math.max(1, Math.floor(plotWidth / (estimatedWidth + safetyMargin)));
-        const autoInterval = Math.max(1, Math.ceil(xCategories.length / maxFittingLabels));
+        const maxFittingLabels = Math.max(
+          1,
+          Math.floor(plotWidth / (estimatedWidth + safetyMargin))
+        );
+
+        const autoInterval = Math.max(
+          1,
+          Math.ceil(xCategories.length / maxFittingLabels)
+        );
+
         const tickInterval = userInterval || autoInterval;
 
         xCategories.forEach((label, index) => {
@@ -412,7 +507,13 @@ export const Datum = {
           const shouldRender = isFirst || isStep || isLast;
           if (!shouldRender) return;
 
-          const xPos = getX(index, xCategories.length);
+          const numericValue = Number(label);
+
+          const xPos =
+            isScatterOnly && Number.isFinite(numericValue)
+              ? getNumericX(numericValue)
+              : getX(index, xCategories.length);
+
           const tickEndY = plotBottom + TICK_LENGTH;
 
           const tick = document.createElementNS(SVG_NS, 'line');
@@ -424,8 +525,13 @@ export const Datum = {
           xAxisGroup.appendChild(tick);
 
           const labelY = tickEndY + 8;
+
           const xLabel = document.createElementNS(SVG_NS, 'text');
-          xLabel.setAttribute('class', 'datum-axis-label datum-axis-text datum-axis-text-x datum-ff datum-fs-sm datum-fw-400 datum-color-muted');
+          xLabel.setAttribute(
+            'class',
+            'datum-axis-label datum-axis-text datum-axis-text-x datum-ff datum-fs-sm datum-fw-400 datum-color-muted'
+          );
+
           xLabel.setAttribute('x', xPos);
           xLabel.setAttribute('y', labelY);
 
@@ -433,10 +539,16 @@ export const Datum = {
             xLabel.setAttribute('text-anchor', 'middle');
           } else if (labelAngle < 0) {
             xLabel.setAttribute('text-anchor', 'end');
-            xLabel.setAttribute('transform', `rotate(${labelAngle}, ${xPos}, ${labelY})`);
+            xLabel.setAttribute(
+              'transform',
+              `rotate(${labelAngle}, ${xPos}, ${labelY})`
+            );
           } else {
             xLabel.setAttribute('text-anchor', 'start');
-            xLabel.setAttribute('transform', `rotate(${labelAngle}, ${xPos}, ${labelY})`);
+            xLabel.setAttribute(
+              'transform',
+              `rotate(${labelAngle}, ${xPos}, ${labelY})`
+            );
           }
 
           xLabel.textContent = label;
@@ -485,6 +597,7 @@ export const Datum = {
         tooltipController: layerTooltipActive ? tooltipController : null,
         getX,
         getY,
+        getNumericX,
         getBand,
         getYBand,
         valueMin: heatMinVal,
@@ -524,6 +637,8 @@ export const Datum = {
         xCategories,
         getX,
         getY,
+        getNumericX,
+        isScatterOnly,
         plotLeft,
         plotRight,
         plotTop,

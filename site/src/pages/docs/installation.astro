@@ -1,0 +1,90 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout
+    title="Installation"
+    description="Install Datum and add it to your JavaScript application."
+>
+    <h1>Installation</h1>
+
+    <p class="docs-lead">
+        Datum is distributed as an ES module and can be installed
+        with npm or loaded directly in the browser.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Install with npm</h2>
+
+        <p>
+            Install Datum from npm:
+        </p>
+
+        <pre><code>npm install @psdpainter/datum-js</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Import Datum</h2>
+
+        <p>
+            Import the library from your application code:
+        </p>
+
+        <pre><code>{`import {
+    Datum,
+    Color
+} from '@psdpainter/datum-js';`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Import the stylesheet</h2>
+
+        <p>
+            Datum includes the styles required by its visualization
+            components. Import the stylesheet once in your application:
+        </p>
+
+        <pre><code>import '@psdpainter/datum-js/style';</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Browser usage</h2>
+
+        <p>
+            Datum also ships an IIFE build for applications that
+            load JavaScript directly with a script element.
+        </p>
+
+        <pre><code>{`<link
+    rel="stylesheet"
+    href="/path/to/datum.css"
+/>
+
+<script src="/path/to/datum.min.js"></script>`}</code></pre>
+
+        <p>
+            The browser build exposes Datum through the global
+            <code>Datum</code> object.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Package contents</h2>
+
+        <p>
+            The npm package includes the ES module, browser build
+            and Datum stylesheet.
+        </p>
+
+        <pre><code>{`dist/
+├── datum.js
+├── datum.min.js
+└── datum.css`}</code></pre>
+    </section>
+
+</DocsLayout>

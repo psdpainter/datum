@@ -1,0 +1,216 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-candlestick.js?raw';
+---
+
+<DocsLayout
+    title="Candlestick"
+    description="Visualize open, high, low and close values with candlestick layers in Datum."
+>
+    <h1>Candlestick</h1>
+
+    <p class="docs-lead">
+        Candlestick layers visualize open, high, low and close values
+        for a sequence of observations. They are commonly used for
+        financial and market data.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Pass OHLC data to <code>Datum.candlestick()</code>.
+            Each datum represents one candlestick.
+        </p>
+
+        <DatumDemo
+            id="candlestick-example"
+            title="Candlestick"
+            description="Open, high, low and close values across a sequence of observations."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.candlestick(data, {
+    x,
+    open,
+    high,
+    low,
+    close,
+    upColor,
+    downColor,
+    strokeWidth,
+    rx,
+    bodyRatio
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data</h2>
+
+        <p>
+            Each object should provide values for the X position,
+            opening price, highest price, lowest price and closing price.
+        </p>
+
+        <pre><code>{`const values = [{
+    x: 'Mon',
+    open: 142,
+    high: 151,
+    low: 139,
+    close: 148
+}, {
+    x: 'Tue',
+    open: 148,
+    high: 153,
+    low: 144,
+    close: 146
+}];
+
+Datum.candlestick(values);`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data keys</h2>
+
+        <p>
+            By default, Datum expects properties named
+            <code>x</code>, <code>open</code>, <code>high</code>,
+            <code>low</code> and <code>close</code>.
+        </p>
+
+        <p>
+            You can map differently named properties to the expected
+            candlestick dimensions.
+        </p>
+
+        <pre><code>{`const prices = [{
+    date: 'Mon',
+    opening: 142,
+    maximum: 151,
+    minimum: 139,
+    closing: 148
+}];
+
+Datum.candlestick(prices, {
+    x: 'date',
+    open: 'opening',
+    high: 'maximum',
+    low: 'minimum',
+    close: 'closing'
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Up and down colors</h2>
+
+        <p>
+            Candlesticks use separate colors depending on whether the
+            closing value is above or below the opening value.
+        </p>
+
+        <pre><code>{`Datum.candlestick(values, {
+    upColor: Color.Green,
+    downColor: Color.Red
+});`}</code></pre>
+
+        <p>
+            An up candle represents an observation where
+            <code>close &gt;= open</code>. A down candle represents
+            an observation where <code>close &lt; open</code>.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Stroke width</h2>
+
+        <p>
+            Use <code>strokeWidth</code> to control the thickness of
+            the candlestick wick and body outline.
+        </p>
+
+        <pre><code>{`Datum.candlestick(values, {
+    strokeWidth: 2
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Rounded corners</h2>
+
+        <p>
+            Use <code>rx</code> to control the corner radius of the
+            candlestick body.
+        </p>
+
+        <pre><code>{`Datum.candlestick(values, {
+    rx: 2
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Body width</h2>
+
+        <p>
+            Use <code>bodyRatio</code> to control how much of the
+            available category width is occupied by the candle body.
+        </p>
+
+        <pre><code>{`Datum.candlestick(values, {
+    bodyRatio: 0.6
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    x: 'x',
+    open: 'open',
+    high: 'high',
+    low: 'low',
+    close: 'close',
+
+    upColor: Color.Green,
+    downColor: Color.Red,
+
+    strokeWidth: 1,
+    rx: 1,
+    bodyRatio: 0.6
+}`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Understanding a candlestick</h2>
+
+        <p>
+            The body spans the opening and closing values. The wick
+            extends from the low value to the high value.
+        </p>
+
+        <p>
+            Together, these four values show both the range of the
+            observation and the direction of movement between its
+            opening and closing values.
+        </p>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-candlestick.js';
+</script>

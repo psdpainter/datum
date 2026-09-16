@@ -1,0 +1,77 @@
+---
+import '../styles/datum-demo.css';
+
+const {
+    id,
+    title,
+    description,
+    code
+} = Astro.props;
+---
+
+<section class="datum-demo">
+
+    <header class="datum-demo-header">
+        <div>
+            <h3>{title}</h3>
+
+            {
+                description && (
+                    <p>{description}</p>
+                )
+            }
+        </div>
+    </header>
+
+    <div class="datum-demo-preview">
+        <div
+            id={id}
+            class="datum-demo-target"
+        ></div>
+    </div>
+
+    <div class="datum-demo-source">
+
+        <div class="datum-demo-source-header">
+            <span>JavaScript</span>
+
+            <button
+                type="button"
+                class="datum-demo-copy"
+                data-code={code}
+            >
+                Copy
+            </button>
+        </div>
+
+        <pre><code>{code}</code></pre>
+
+    </div>
+
+</section>
+
+<script>
+    document.addEventListener('click', async event => {
+        const button = event.target.closest('.datum-demo-copy');
+
+        if (!button) {
+            return;
+        }
+
+        const code = button.dataset.code;
+
+        if (!code) {
+            return;
+        }
+
+        await navigator.clipboard.writeText(code);
+
+        const originalText = button.textContent;
+
+        button.textContent = 'Copied';
+
+        window.setTimeout(() => {
+            button.textContent = originalText;
+        }, 1200);
+    });
+</script>

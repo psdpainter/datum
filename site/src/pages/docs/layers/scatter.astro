@@ -1,0 +1,216 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-scatter.js?raw';
+---
+
+<DocsLayout
+    title="Scatter"
+    description="Visualize individual observations with scatter layers in Datum."
+>
+    <h1>Scatter</h1>
+
+    <p class="docs-lead">
+        Scatter layers display individual observations as points,
+        making them useful for visualizing distributions and
+        relationships between values.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Pass an array of objects to <code>Datum.scatter()</code>
+            and identify the properties containing the X and Y values.
+        </p>
+
+        <DatumDemo
+            id="scatter-example"
+            title="Scatter"
+            description="A collection of observations rendered as individual points."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.scatter(data, {
+    x,
+    y,
+    radius,
+    fill,
+    stroke,
+    strokeWidth,
+    opacity
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data</h2>
+
+        <p>
+            By default, Datum expects each observation to contain <code>x</code> and <code>y</code> properties.
+        </p>
+
+        <pre><code>{`const values = [
+    { x: 0, y: 18 },
+    { x: 1, y: 24 },
+    { x: 2, y: 21 },
+    { x: 3, y: 32 }
+];
+
+Datum.scatter(values);`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data keys</h2>
+
+        <p>
+            Use <code>x</code> and <code>y</code> to map custom
+            property names.
+        </p>
+
+        <pre><code>{`const values = [
+    { index: 0, score: 18 },
+    { index: 1, score: 24 },
+    { index: 2, score: 21 }
+];
+
+Datum.scatter(values, {
+    x: 'index',
+    y: 'score'
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Radius</h2>
+
+        <p>
+            Use <code>radius</code> to control the size of each point.
+            The default radius is <code>4</code>.
+        </p>
+
+        <pre><code>{`Datum.scatter(values, {
+    radius: 7
+});`}</code></pre>
+
+        <p>
+            Radius can also be a function, allowing the size of each
+            point to be calculated from its datum.
+        </p>
+
+        <pre><code>{`Datum.scatter(values, {
+    radius: (datum, index) => {
+        return 4 + index;
+    }
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Fill</h2>
+
+        <p>
+            Use <code>fill</code> to set the point color.
+        </p>
+
+        <pre><code>{`Datum.scatter(values, {
+    fill: Color.Blue
+});`}</code></pre>
+
+        <p>
+            Fill can also be provided as a function for per-point
+            styling.
+        </p>
+
+        <pre><code>{`Datum.scatter(values, {
+    fill: (datum) => {
+        return datum.y >= 30
+            ? Color.Green
+            : Color.Blue;
+    }
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Stroke</h2>
+
+        <p>
+            Use <code>stroke</code> and <code>strokeWidth</code> to
+            style the outline around each point.
+        </p>
+
+        <pre><code>{`Datum.scatter(values, {
+    fill: Color.Blue,
+    stroke: '#ffffff',
+    strokeWidth: 2
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Opacity</h2>
+
+        <p>
+            Use <code>opacity</code> to control the transparency of
+            the points. The default is <code>0.85</code>.
+        </p>
+
+        <pre><code>{`Datum.scatter(values, {
+    opacity: 0.6
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Dynamic point styling</h2>
+
+        <p>
+            Scatter points can vary in both size and color based on
+            their underlying datum.
+        </p>
+
+        <pre><code>{`Datum.scatter(values, {
+    radius: (datum) => datum.size,
+    fill: (datum) => {
+        return datum.y > 30
+            ? Color.Green
+            : Color.Blue;
+    }
+});`}</code></pre>
+
+        <p>
+            This makes scatter layers useful for visualizations where
+            additional information needs to be encoded into the
+            appearance of each point.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    x: 'x',
+    y: 'y',
+    radius: 4,
+    fill: null,
+    stroke: '#ffffff',
+    strokeWidth: 1,
+    opacity: 0.85
+}`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-scatter.js';
+</script>

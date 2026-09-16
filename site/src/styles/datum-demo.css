@@ -1,0 +1,82 @@
+.datum-demo {
+    overflow: hidden;
+
+    background: var(--color-background);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.datum-demo-header {
+    padding: var(--space-5);
+
+    border-bottom: 1px solid var(--color-border);
+}
+
+.datum-demo-header h3 {
+    font-size: 1rem;
+}
+
+.datum-demo-header p {
+    margin-top: var(--space-2);
+
+    color: var(--color-text-secondary);
+
+    font-size: 0.875rem;
+}
+
+.datum-demo-preview {
+    min-height: 320px;
+    padding: var(--space-5);
+}
+
+.datum-demo-target {
+    width: 100%;
+    min-height: 280px;
+}
+
+
+/* Source */
+
+.datum-demo-source {
+    background: var(--color-code-background);
+}
+
+.datum-demo-source-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0.7rem var(--space-5);
+
+    color: var(--color-text-muted);
+
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.datum-demo-source pre {
+    border-radius: 0;
+}
+
+.datum-demo-copy {
+    padding: 0;
+
+    color: #aeb4bd;
+    background: transparent;
+
+    border: 0;
+
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.datum-demo-copy:hover {
+    color: #ffffff;
+}

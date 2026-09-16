@@ -67,8 +67,8 @@ export function createBase(options = {}) {
     container.appendChild(title);
   }
 
-  if (options.subtitle || options.subtitle) {
-    const subtitleText = options.subtitle || options.subtitle;
+  if (options.subtitle) {
+    const subtitleText = options.subtitle;
     const subtitle = document.createElement('h3');
     subtitle.className = 'datum-subtitle datum-ff datum-fs-base datum-fw-400 datum-color-muted';
     subtitle.setAttribute('data-datum-subtitle', '');

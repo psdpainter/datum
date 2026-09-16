@@ -1,0 +1,253 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-bar.js?raw';
+---
+
+<DocsLayout
+    title="Bar"
+    description="Create bar layers with Datum, including single, grouped and stacked bar charts."
+>
+    <h1>Bar</h1>
+
+    <p class="docs-lead">
+        Bar layers compare values across discrete categories. A single
+        bar layer creates a standard bar chart, while multiple layers
+        can be arranged as grouped or stacked series.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Create a bar layer with <code>Datum.bar()</code>. Pass the
+            data as the first argument and bar options as the second.
+        </p>
+
+        <DatumDemo
+            id="bar-example"
+            title="Bar chart"
+            description="A basic bar series with rounded corners."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.bar(data, {
+    x,
+    y,
+    fill,
+    stroke,
+    strokeWidth,
+    rx,
+    opacity,
+    stackId
+});`}</code></pre>
+
+        <p>
+            <code>Datum.bar()</code> creates a layer definition that
+            can be included in the <code>datum</code> array passed to
+            <code>Datum.chart()</code>.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data keys</h2>
+
+        <p>
+            Bar layers use <code>x</code> and <code>y</code> as their
+            default data-property names. Map different object properties
+            using the corresponding options.
+        </p>
+
+        <pre><code>{`const sales = [
+    { month: 'Jan', revenue: 18 },
+    { month: 'Feb', revenue: 26 },
+    { month: 'Mar', revenue: 22 }
+];
+
+Datum.bar(sales, {
+    x: 'month',
+    y: 'revenue'
+});`}</code></pre>
+
+        <p>
+            Numeric arrays can also be passed directly. Datum assigns
+            sequential X categories beginning at 1.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Fill</h2>
+
+        <p>
+            Use <code>fill</code> to set the bar color. When no fill
+            is supplied, Datum selects a color from its default series
+            palette.
+        </p>
+
+        <pre><code>{`Datum.bar(values, {
+    fill: Color.Blue
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Stroke</h2>
+
+        <p>
+            Bars can optionally have an outline using
+            <code>stroke</code> and <code>strokeWidth</code>.
+        </p>
+
+        <pre><code>{`Datum.bar(values, {
+    fill: Color.LightBlue,
+    stroke: Color.Blue,
+    strokeWidth: 1
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Rounded corners</h2>
+
+        <p>
+            Use <code>rx</code> to control the corner radius of each
+            bar. The default is <code>2</code>.
+        </p>
+
+        <pre><code>{`Datum.bar(values, {
+    fill: Color.Blue,
+    rx: 6
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Opacity</h2>
+
+        <p>
+            Use <code>opacity</code> to control the transparency of
+            the bars. The default value is <code>1</code>.
+        </p>
+
+        <pre><code>{`Datum.bar(values, {
+    fill: Color.Blue,
+    opacity: 0.7
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Grouped bars</h2>
+
+        <p>
+            Add multiple bar layers to the same chart to compare
+            multiple series within each category. When multiple bar
+            layers are present without stacking, Datum automatically
+            arranges them side by side.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    datum: [
+        Datum.bar(actual, {
+            fill: Color.Blue
+        }),
+
+        Datum.bar(projected, {
+            fill: Color.Green
+        })
+    ]
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Stacked bars</h2>
+
+        <p>
+            Give each bar layer a <code>stackId</code> to combine
+            multiple series vertically instead of displaying them
+            side by side.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    datum: [
+        Datum.bar(product, {
+            fill: Color.Blue,
+            stackId: 'total'
+        }),
+
+        Datum.bar(services, {
+            fill: Color.Green,
+            stackId: 'total'
+        })
+    ]
+});`}</code></pre>
+
+        <p>
+            When multiple bar layers have a stack identifier, Datum
+            treats them as a stacked bar chart and accumulates their
+            values within each category.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    x: 'x',
+    y: 'y',
+    fill: null,
+    stroke: null,
+    strokeWidth: 0,
+    rx: 2,
+    opacity: 1,
+    stackId: null
+}`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Composing with other layers</h2>
+
+        <p>
+            Bar layers can share a chart with other Datum layers.
+            For example, a ruler can provide a reference value across
+            the bars.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    datum: [
+        Datum.bar(values, {
+            fill: Color.Blue
+        }),
+
+        Datum.ruler([], {
+            value: 30,
+            stroke: Color.Red,
+            dashed: true
+        })
+    ]
+});`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-bar.js';
+</script>

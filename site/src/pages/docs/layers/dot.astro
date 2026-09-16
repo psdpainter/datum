@@ -1,0 +1,221 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-dot.js?raw';
+---
+
+<DocsLayout
+    title="Dot"
+    description="Create dot layers with Datum and configure point size, fill, stroke and data mapping."
+>
+    <h1>Dot</h1>
+
+    <p class="docs-lead">
+        Dot layers display individual observations as circles positioned
+        along the chart. They can be used independently or composed with
+        lines, areas and other layers to emphasize individual values.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Create a dot layer with <code>Datum.dot()</code>. Pass the
+            data as the first argument and dot options as the second.
+        </p>
+
+        <DatumDemo
+            id="dot-example"
+            title="Dot chart"
+            description="Individual values displayed as outlined circles."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.dot(data, {
+    x,
+    y,
+    radius,
+    fill,
+    stroke,
+    strokeWidth,
+    name,
+    tooltip
+});`}</code></pre>
+
+        <p>
+            <code>Datum.dot()</code> creates a layer definition that
+            can be included in the <code>datum</code> array passed to
+            <code>Datum.chart()</code>.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data keys</h2>
+
+        <p>
+            Dot layers use <code>x</code> and <code>y</code> as their
+            default data-property names. Use the corresponding options
+            when your data objects use different property names.
+        </p>
+
+        <pre><code>{`const sales = [
+    { month: 'Jan', revenue: 18 },
+    { month: 'Feb', revenue: 26 },
+    { month: 'Mar', revenue: 22 }
+];
+
+Datum.dot(sales, {
+    x: 'month',
+    y: 'revenue'
+});`}</code></pre>
+
+        <p>
+            Numeric arrays can also be passed directly. Datum assigns
+            sequential X categories beginning at 1.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Radius</h2>
+
+        <p>
+            Use <code>radius</code> to control the size of each dot.
+            The default radius is <code>4</code>.
+        </p>
+
+        <pre><code>{`Datum.dot(values, {
+    radius: 6
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Fill</h2>
+
+        <p>
+            Use <code>fill</code> to control the interior color of
+            each dot. The default fill is white.
+        </p>
+
+        <pre><code>{`Datum.dot(values, {
+    fill: Color.Blue
+});`}</code></pre>
+
+        <p>
+            A white fill can be useful when dots are composed over a
+            line or area because the points remain visually distinct.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Stroke</h2>
+
+        <p>
+            Use <code>stroke</code> and <code>strokeWidth</code> to
+            control the outline of each dot. When no stroke color is
+            supplied, Datum selects a color from its default series
+            palette.
+        </p>
+
+        <pre><code>{`Datum.dot(values, {
+    fill: '#ffffff',
+    stroke: Color.Blue,
+    strokeWidth: 2
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Series name</h2>
+
+        <p>
+            Use <code>name</code> to give the dot layer a meaningful
+            series label. Datum uses this value when displaying the
+            layer in the chart legend.
+        </p>
+
+        <pre><code>{`Datum.dot(values, {
+    name: 'Observations',
+    stroke: Color.Blue
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Tooltips</h2>
+
+        <p>
+            Dot layers participate in the chart's shared tooltip and
+            crosshair interaction by default.
+        </p>
+
+        <p>
+            Set <code>tooltip</code> to <code>false</code> to exclude
+            the layer from tooltip interaction.
+        </p>
+
+        <pre><code>{`Datum.dot(values, {
+    tooltip: false
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    x: 'x',
+    y: 'y',
+    radius: 4,
+    fill: '#ffffff',
+    stroke: null,
+    strokeWidth: 2,
+    name: undefined,
+    tooltip: undefined
+}`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Composing with a line</h2>
+
+        <p>
+            Dot layers are commonly placed above a line layer to make
+            each individual observation visible. Because Datum renders
+            layers in array order, place the dots after the line.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    datum: [
+        Datum.line(values, {
+            stroke: Color.Blue,
+            strokeWidth: 2
+        }),
+
+        Datum.dot(values, {
+            stroke: Color.Blue,
+            strokeWidth: 2,
+            fill: '#ffffff',
+            radius: 4
+        })
+    ]
+});`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-dot.js';
+</script>

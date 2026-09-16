@@ -1,0 +1,186 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import DatumDemo from '../../components/DatumDemo.astro';
+import exampleCode from '../../examples/data-objects.js?raw';
+---
+
+<DocsLayout
+    title="Data"
+    description="Learn how Datum works with primitive arrays, structured objects and custom data keys."
+>
+    <h1>Data</h1>
+
+    <p class="docs-lead">
+        Datum accepts both simple numeric arrays and structured objects.
+        Use key mapping to connect existing application data directly to
+        visualization layers.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Numeric arrays</h2>
+
+        <p>
+            For simple datasets, pass an array of numbers directly to
+            a layer.
+        </p>
+
+        <pre><code>{`const values = [
+    12,
+    18,
+    14,
+    24,
+    20
+];
+
+Datum.line(values);`}</code></pre>
+
+        <p>
+            Datum automatically converts each value into an internal
+            data point. Array positions become sequential X categories
+            beginning at 1, while each number becomes the Y value.
+        </p>
+
+        <pre><code>{`[
+    { x: 1, y: 12 },
+    { x: 2, y: 18 },
+    { x: 3, y: 14 },
+    { x: 4, y: 24 },
+    { x: 5, y: 20 }
+]`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Structured objects</h2>
+
+        <p>
+            Application data often already exists as objects. Datum
+            can use these objects directly without requiring them to
+            be converted into a specific chart-data shape.
+        </p>
+
+        <DatumDemo
+            id="data-objects"
+            title="Object data"
+            description="Existing object properties are mapped directly to the chart."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Key mapping</h2>
+
+        <p>
+            By default, Cartesian layers look for properties named
+            <code>x</code> and <code>y</code>. Use the
+            <code>x</code> and <code>y</code> options when your data
+            uses different property names.
+        </p>
+
+        <pre><code>{`const sales = [
+    { month: 'Jan', revenue: 18 },
+    { month: 'Feb', revenue: 26 },
+    { month: 'Mar', revenue: 22 }
+];
+
+Datum.line(sales, {
+    x: 'month',
+    y: 'revenue'
+});`}</code></pre>
+
+        <p>
+            Here, <code>month</code> supplies the X-axis category and
+            <code>revenue</code> supplies the numeric Y value.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Categorical X values</h2>
+
+        <p>
+            Datum's standard Cartesian layers currently treat the
+            X-axis as an ordered set of categories. Data points are
+            positioned according to their order in the array, while
+            the mapped X property provides the category label.
+        </p>
+
+        <pre><code>{`const data = [
+    { label: 'Alpha', value: 10 },
+    { label: 'Beta', value: 25 },
+    { label: 'Gamma', value: 18 }
+];
+
+Datum.line(data, {
+    x: 'label',
+    y: 'value'
+});`}</code></pre>
+
+        <p>
+            This makes strings, dates and other application values
+            useful as X-axis labels without requiring numeric X
+            coordinates.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Shared data</h2>
+
+        <p>
+            The same dataset can be passed to multiple layers. Each
+            layer can then provide its own visual representation while
+            sharing the chart's categories and coordinate system.
+        </p>
+
+        <pre><code>{`const sales = [
+    { month: 'Jan', revenue: 18 },
+    { month: 'Feb', revenue: 26 },
+    { month: 'Mar', revenue: 22 }
+];
+
+Datum.chart({
+    target: '#chart',
+
+    datum: [
+        Datum.line(sales, {
+            x: 'month',
+            y: 'revenue'
+        }),
+
+        Datum.dot(sales, {
+            x: 'month',
+            y: 'revenue'
+        })
+    ]
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data order</h2>
+
+        <p>
+            Array order determines the horizontal order of standard
+            Cartesian data points. If categories should appear in a
+            particular sequence, arrange the input data in that
+            sequence before passing it to Datum.
+        </p>
+
+        <pre><code>{`const sales = records
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+
+Datum.line(sales, {
+    x: 'month',
+    y: 'revenue'
+});`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../examples/data-objects.js';
+</script>

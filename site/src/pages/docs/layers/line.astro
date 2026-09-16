@@ -1,0 +1,233 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-line.js?raw';
+---
+
+<DocsLayout
+    title="Line"
+    description="Create line layers with Datum and configure color, width, smoothing, data keys and interaction."
+>
+    <h1>Line</h1>
+
+    <p class="docs-lead">
+        Line layers connect a series of values across the chart's
+        X-axis categories. They can be used alone or composed with
+        other layers such as areas, dots and rulers.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Create a line layer with <code>Datum.line()</code>. Pass
+            the data as the first argument and line options as the
+            second.
+        </p>
+
+        <DatumDemo
+            id="line-example"
+            title="Line chart"
+            description="A smoothed line with a custom stroke and series name."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.line(data, {
+    x,
+    y,
+    stroke,
+    strokeWidth,
+    smooth,
+    tension,
+    name,
+    tooltip
+});`}</code></pre>
+
+        <p>
+            <code>Datum.line()</code> creates a layer definition. Pass
+            that layer to the <code>datum</code> array of
+            <code>Datum.chart()</code> to render it.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data keys</h2>
+
+        <p>
+            Line layers use <code>x</code> and <code>y</code> as their
+            default data-property names. Use the corresponding options
+            to map other object properties.
+        </p>
+
+        <pre><code>{`const sales = [
+    { month: 'Jan', revenue: 18 },
+    { month: 'Feb', revenue: 26 },
+    { month: 'Mar', revenue: 22 }
+];
+
+Datum.line(sales, {
+    x: 'month',
+    y: 'revenue'
+});`}</code></pre>
+
+        <p>
+            Numeric arrays can also be passed directly. Datum assigns
+            sequential X categories beginning at 1.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Stroke</h2>
+
+        <p>
+            Use <code>stroke</code> to set the line color and
+            <code>strokeWidth</code> to control its thickness.
+        </p>
+
+        <pre><code>{`Datum.line(values, {
+    stroke: Color.Blue,
+    strokeWidth: 3
+});`}</code></pre>
+
+        <p>
+            When <code>stroke</code> is not supplied, Datum selects a
+            color from its default series palette.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Smoothing</h2>
+
+        <p>
+            Lines use straight segments by default. Set
+            <code>smooth</code> to <code>true</code> to render a
+            smooth cubic Bézier path between points.
+        </p>
+
+        <pre><code>{`Datum.line(values, {
+    smooth: true
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Tension</h2>
+
+        <p>
+            The <code>tension</code> option controls the shape of a
+            smoothed line. Its default value is <code>0.2</code>.
+        </p>
+
+        <pre><code>{`Datum.line(values, {
+    smooth: true,
+    tension: 0.2
+});`}</code></pre>
+
+        <p>
+            Tension only affects the line when <code>smooth</code> is
+            enabled.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Series name</h2>
+
+        <p>
+            Use <code>name</code> to give the line a meaningful series
+            label. Datum uses this value when displaying the layer in
+            the chart legend.
+        </p>
+
+        <pre><code>{`Datum.line(values, {
+    name: 'Sessions',
+    stroke: Color.Blue
+});`}</code></pre>
+
+        <p>
+            Legend items are interactive. Selecting an item toggles
+            the visibility of its corresponding layer.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Tooltips</h2>
+
+        <p>
+            Line layers participate in the chart's shared tooltip and
+            crosshair interaction by default.
+        </p>
+
+        <p>
+            Set <code>tooltip</code> to <code>false</code> on the
+            layer to exclude it from layer-level tooltip interaction.
+        </p>
+
+        <pre><code>{`Datum.line(values, {
+    tooltip: false
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    x: 'x',
+    y: 'y',
+    stroke: null,
+    strokeWidth: 2,
+    smooth: false,
+    tension: 0.2,
+    name: undefined,
+    tooltip: undefined
+}`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Composing with other layers</h2>
+
+        <p>
+            A line is often combined with area and dot layers to add
+            context or emphasize individual observations.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    datum: [
+        Datum.area(values, {
+            fill: Color.LightBlue,
+            opacity: 0.2
+        }),
+
+        Datum.line(values, {
+            stroke: Color.Blue,
+            strokeWidth: 2
+        }),
+
+        Datum.dot(values, {
+            stroke: Color.Blue,
+            fill: '#ffffff'
+        })
+    ]
+});`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-line.js';
+</script>

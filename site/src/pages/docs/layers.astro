@@ -1,0 +1,187 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import DatumDemo from '../../components/DatumDemo.astro';
+import exampleCode from '../../examples/layers-composition.js?raw';
+---
+
+<DocsLayout
+    title="Layers"
+    description="Learn how Datum composes visualization and reference layers into charts."
+>
+    <h1>Layers</h1>
+
+    <p class="docs-lead">
+        Layers are the building blocks of Datum visualizations. A chart
+        can contain one layer or compose several layers on the same
+        drawing surface.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Composition</h2>
+
+        <p>
+            Each layer describes one visual representation of data.
+            Pass layers to the <code>datum</code> array of
+            <code>Datum.chart()</code> to compose a visualization.
+        </p>
+
+        <DatumDemo
+            id="layers-composition"
+            title="Layer composition"
+            description="Area, line, dot and ruler layers combined in one chart."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Creating layers</h2>
+
+        <p>
+            Layers are created independently and then passed to a chart.
+            Each layer receives its data followed by an options object.
+        </p>
+
+        <pre><code>{`const line = Datum.line(values, {
+    stroke: Color.Blue,
+    strokeWidth: 2
+});
+
+const dots = Datum.dot(values, {
+    stroke: Color.Blue,
+    fill: '#ffffff',
+    radius: 4
+});
+
+Datum.chart({
+    target: '#chart',
+    datum: [
+        line,
+        dots
+    ]
+});`}</code></pre>
+
+        <p>
+            Layers can share the same dataset or use different datasets
+            when the visualization requires it.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Available layers</h2>
+
+        <p>
+            Datum currently includes layers for common Cartesian,
+            statistical, financial and categorical visualizations.
+        </p>
+
+        <pre><code>{`Datum.line(...)
+Datum.dot(...)
+Datum.area(...)
+Datum.bar(...)
+Datum.histogram(...)
+Datum.scatter(...)
+Datum.candlestick(...)
+Datum.pie(...)
+Datum.range(...)
+Datum.heatmap(...)
+Datum.ruler(...)`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Series layers</h2>
+
+        <p>
+            Layers such as <code>line</code>, <code>area</code>,
+            <code>dot</code> and <code>bar</code> represent a series
+            of values. When composed in the same chart, they share the
+            chart's categories, plot area and Y scale.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    datum: [
+        Datum.area(values),
+        Datum.line(values),
+        Datum.dot(values)
+    ]
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Reference layers</h2>
+
+        <p>
+            Not every layer needs to represent a complete data series.
+            The <code>ruler</code> layer adds a reference line to the
+            chart and can be used for thresholds, averages, targets or
+            other significant values.
+        </p>
+
+        <pre><code>{`Datum.ruler([], {
+    value: mean(values),
+    stroke: Color.Red,
+    dashed: true
+});`}</code></pre>
+
+        <p>
+            Rulers are horizontal by default. Set
+            <code>direction</code> to <code>'vertical'</code> to
+            reference an X-axis category instead.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Layer order</h2>
+
+        <p>
+            Layers are rendered in the order they appear in the
+            <code>datum</code> array. Later layers are drawn over
+            earlier layers.
+        </p>
+
+        <pre><code>{`datum: [
+    Datum.area(values),
+    Datum.line(values),
+    Datum.dot(values),
+    Datum.ruler([], {
+        value: 25
+    })
+]`}</code></pre>
+
+        <p>
+            Place background-oriented layers such as areas before
+            foreground layers such as lines and dots when they should
+            appear underneath them.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Layer options</h2>
+
+        <p>
+            Each layer type exposes options appropriate to its visual
+            role. A line can control properties such as stroke width
+            and smoothing, while a bar can control fill, opacity,
+            corner radius and stacking.
+        </p>
+
+        <p>
+            The individual layer reference pages document the options
+            available for each layer type.
+        </p>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../examples/layers-composition.js';
+</script>

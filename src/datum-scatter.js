@@ -38,7 +38,7 @@ export function scatter(data = [], keysAndOptions = {}) {
 }
 
 export function renderScatterLayer(layer, context, layerIndex = 0) {
-  const { svg, getX, getY } = context;
+  const { svg, getNumericX, getY } = context;
   const { data, keys, options } = layer;
 
   if (!data || data.length === 0) return;
@@ -50,8 +50,15 @@ export function renderScatterLayer(layer, context, layerIndex = 0) {
     const rawX = Number(d[keys.x]);
     const rawY = Number(d[keys.y]);
 
-    const cx = typeof getX === 'function' ? getX(isNaN(rawX) ? index : rawX, data.length) : 0;
-    const cy = typeof getY === 'function' ? getY(isNaN(rawY) ? 0 : rawY) : 0;
+    // const cx = typeof getX === 'function' ? getX(isNaN(rawX) ? index : rawX, data.length) : 0;
+    //const cy = typeof getY === 'function' ? getY(isNaN(rawY) ? 0 : rawY) : 0;
+    const cx = typeof getNumericX === 'function'
+      ? getNumericX(Number.isFinite(rawX) ? rawX : index)
+      : 0;
+
+    const cy = typeof getY === 'function'
+      ? getY(Number.isFinite(rawY) ? rawY : 0)
+      : 0;
 
     const r = typeof options.radius === 'function' ? options.radius(d, index) : options.radius;
     const fill = typeof layerFill === 'function' ? layerFill(d, index) : layerFill;

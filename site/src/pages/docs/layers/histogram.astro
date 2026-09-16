@@ -1,0 +1,218 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-histogram.js?raw';
+---
+
+<DocsLayout
+    title="Histogram"
+    description="Visualize the distribution of numeric data with histogram layers in Datum."
+>
+    <h1>Histogram</h1>
+
+    <p class="docs-lead">
+        Histogram layers visualize the distribution of numeric data by
+        dividing observations into intervals and displaying the number
+        of values contained within each interval.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Pass an array of numeric observations to
+            <code>Datum.histogram()</code>. Datum automatically divides
+            the values into bins and counts the observations in each one.
+        </p>
+
+        <DatumDemo
+            id="histogram-example"
+            title="Histogram"
+            description="A distribution of numeric observations divided into six bins."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.histogram(data, {
+    bins,
+    fill,
+    stroke,
+    strokeWidth,
+    rx,
+    opacity
+});`}</code></pre>
+
+        <p>
+            Unlike a standard bar layer, the height of each histogram
+            bar does not come directly from an individual input value.
+            Datum groups the observations into bins and calculates the
+            frequency of each interval.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data</h2>
+
+        <p>
+            The simplest histogram dataset is an array of numbers.
+        </p>
+
+        <pre><code>{`const values = [
+    12, 14, 15, 18, 18,
+    19, 20, 20, 21, 22,
+    22, 23, 24, 26, 30
+];
+
+Datum.histogram(values);`}</code></pre>
+
+        <p>
+            Each number represents an individual observation rather
+            than the height of a bar.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Bins</h2>
+
+        <p>
+            Use <code>bins</code> to control how many intervals Datum
+            uses when grouping the observations. The default is
+            <code>6</code>.
+        </p>
+
+        <pre><code>{`Datum.histogram(values, {
+    bins: 8
+});`}</code></pre>
+
+        <p>
+            Increasing the number of bins provides more detail, while
+            fewer bins provide a broader view of the distribution.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Fill</h2>
+
+        <p>
+            Use <code>fill</code> to set the color of the histogram
+            bars.
+        </p>
+
+        <pre><code>{`Datum.histogram(values, {
+    fill: Color.Blue
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Stroke</h2>
+
+        <p>
+            Use <code>stroke</code> and <code>strokeWidth</code> to
+            control the outline around each histogram bar.
+        </p>
+
+        <pre><code>{`Datum.histogram(values, {
+    fill: Color.Blue,
+    stroke: '#ffffff',
+    strokeWidth: 1
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Rounded corners</h2>
+
+        <p>
+            Use <code>rx</code> to control the corner radius of each
+            histogram bar. The default is <code>2</code>.
+        </p>
+
+        <pre><code>{`Datum.histogram(values, {
+    fill: Color.Blue,
+    rx: 4
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Opacity</h2>
+
+        <p>
+            Use <code>opacity</code> to control the transparency of
+            the histogram bars. The default is <code>1</code>.
+        </p>
+
+        <pre><code>{`Datum.histogram(values, {
+    fill: Color.Blue,
+    opacity: 0.7
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Object data</h2>
+
+        <p>
+            Histograms can also extract numeric observations from
+            objects. Datum looks for a <code>value</code> property,
+            followed by <code>y</code>.
+        </p>
+
+        <pre><code>{`const observations = [
+    { value: 12 },
+    { value: 18 },
+    { value: 22 },
+    { value: 24 },
+    { value: 30 }
+];
+
+Datum.histogram(observations);`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    bins: 6,
+    fill: null,
+    stroke: '#ffffff',
+    strokeWidth: 1,
+    rx: 2,
+    opacity: 1
+}`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Histogram vs. bar</h2>
+
+        <p>
+            Although histograms and bar charts have a similar visual
+            appearance, they represent different kinds of data.
+        </p>
+
+        <p>
+            Use <code>Datum.bar()</code> when each bar represents a
+            discrete category and its associated value. Use
+            <code>Datum.histogram()</code> when you have a collection
+            of numeric observations and want to visualize their
+            distribution.
+        </p>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-histogram.js';
+</script>

@@ -1,0 +1,105 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import '../styles/docs.css';
+
+const {
+    title,
+    description
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+
+const sections = [
+    {
+        title: 'Getting Started',
+        links: [
+            { label: 'Introduction', href: '/docs' },
+            { label: 'Installation', href: '/docs/installation' },
+            { label: 'Quick Start', href: '/docs/quick-start' }
+        ]
+    },
+    {
+        title: 'Core Concepts',
+        links: [
+            { label: 'Charts', href: '/docs/charts' },
+            { label: 'Data', href: '/docs/data' },
+            { label: 'Layers', href: '/docs/layers' }
+        ]
+    },
+    {
+        title: 'Layers',
+        links: [
+            { label: 'Line', href: '/docs/layers/line' },
+            { label: 'Area', href: '/docs/layers/area' },
+            { label: 'Bar', href: '/docs/layers/bar' },
+            { label: 'Dot', href: '/docs/layers/dot' },
+            { label: 'Ruler', href: '/docs/layers/ruler' },
+            { label: 'Histogram', href: '/docs/layers/histogram' },
+            { label: 'Candlestick', href: '/docs/layers/candlestick' },
+            { label: 'Scatter', href: '/docs/layers/scatter' },
+            { label: 'Pie', href: '/docs/layers/pie' },
+            { label: 'Heatmap', href: '/docs/layers/heatmap' },
+            { label: 'Range', href: '/docs/layers/range' }
+        ]
+    }
+];
+
+/*
+{
+        title: 'Reference',
+        links: [
+            { label: 'API', href: '/docs/api' },
+            { label: 'Colors', href: '/docs/colors' },
+            { label: 'Statistics', href: '/docs/statistics' }
+        ]
+    }
+*/
+
+const isActive = (href) => pathname === href;
+---
+
+<BaseLayout
+    title={title}
+    description={description}
+>
+    <div class="docs-layout">
+
+        <aside class="docs-sidebar">
+            <nav aria-label="Documentation">
+
+                {
+                    sections.map(section => (
+                        <section class="docs-nav-section">
+                            <h2>{section.title}</h2>
+
+                            <ul>
+                                {
+                                    section.links.map(link => (
+                                        <li>
+                                            <a
+                                                href={link.href}
+                                                class:list={[
+                                                    {
+                                                        active: isActive(link.href)
+                                                    }
+                                                ]}
+                                            >
+                                                {link.label}
+                                            </a>
+                                        </li>
+                                    ))
+                                }
+                            </ul>
+                        </section>
+                    ))
+                }
+
+            </nav>
+        </aside>
+
+        <article class="docs-content">
+            <slot />
+        </article>
+
+    </div>
+</BaseLayout>

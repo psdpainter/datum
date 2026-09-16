@@ -1,0 +1,220 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import DatumDemo from '../../components/DatumDemo.astro';
+import exampleCode from '../../examples/charts-basic.js?raw';
+---
+
+<DocsLayout
+    title="Charts"
+    description="Learn how Datum charts provide the shared surface for composable visualization layers."
+>
+    <h1>Charts</h1>
+
+    <p class="docs-lead">
+        A Datum chart provides the shared drawing surface, coordinate
+        system and configuration used by one or more visualization layers.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Creating a chart</h2>
+
+        <p>
+            Create a chart with <code>Datum.chart()</code>. The
+            <code>target</code> option identifies the element where the
+            chart will be rendered, while <code>datum</code> contains
+            the visualization layers that make up the chart.
+        </p>
+
+        <DatumDemo
+            id="charts-basic"
+            title="Basic chart"
+            description="Area, line and dot layers sharing a single chart."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Target</h2>
+
+        <p>
+            The <code>target</code> option can be a CSS selector or
+            an existing DOM element.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+    datum: [...]
+});`}</code></pre>
+
+        <p>
+            Datum creates its chart container and SVG inside the
+            target element.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Layers</h2>
+
+        <p>
+            The <code>datum</code> option is an array of visualization
+            layers. Multiple layers can share the same chart surface
+            and coordinate system.
+        </p>
+
+        <pre><code>{`datum: [
+    Datum.area(values, {...}),
+    Datum.line(values, {...}),
+    Datum.dot(values, {...})
+]`}</code></pre>
+
+        <p>
+            This composition model allows different visual
+            representations of the same or related data to be
+            combined into a single chart.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Size</h2>
+
+        <p>
+            Use <code>width</code> and <code>height</code> to control
+            the chart dimensions.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+    width: 800,
+    height: 400,
+    datum: [...]
+});`}</code></pre>
+
+        <p>
+            When a numeric width is not supplied, Datum measures the
+            available width of the chart container. The default
+            fallback width is 600 pixels and the default height is
+            360 pixels.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Chart text</h2>
+
+        <p>
+            Charts can include a title, subtitle and caption.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    title: 'Weekly activity',
+    subtitle: 'Sessions over the last seven days',
+    caption: 'Example data',
+
+    datum: [...]
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Automatic layout</h2>
+
+        <p>
+            Datum calculates the chart plot area from the data and
+            configured layers. Axis spacing and padding are adjusted
+            automatically to accommodate labels, ticks and legends.
+        </p>
+
+        <p>
+            Bar, histogram, candlestick and heatmap layers use
+            band-based horizontal positioning, while continuous
+            layers such as lines and areas are positioned across the
+            available plot width.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Configuration</h2>
+
+        <p>
+            Additional chart behavior is configured through the
+            <code>config</code> object.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    config: {
+        padding: {
+            top: 24,
+            right: 24,
+            bottom: 36,
+            left: 36
+        },
+
+        xAxis: {
+            labelAngle: 0,
+            interval: 1
+        }
+    },
+
+    datum: [...]
+});`}</code></pre>
+
+        <p>
+            Datum automatically calculates padding when individual
+            values are not supplied.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Animation</h2>
+
+        <p>
+            Set <code>animated</code> to <code>true</code> to enable
+            chart animation.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+    animated: true,
+    animationDelay: '40ms',
+    datum: [...]
+});`}</code></pre>
+
+        <p>
+            <code>animationDelay</code> accepts a millisecond value
+            such as <code>'40ms'</code> or <code>'200ms'</code>.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Tooltips</h2>
+
+        <p>
+            Tooltips are enabled by default. Set
+            <code>tooltip</code> to <code>false</code> when a chart
+            should not display interactive tooltip information.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+    tooltip: false,
+    datum: [...]
+});`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../examples/charts-basic.js';
+</script>

@@ -1,0 +1,536 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/home.css';
+---
+
+<BaseLayout
+    title="Datum — Data visualization for modern web apps"
+    description="A lightweight, composable JavaScript data visualization library for modern web applications."
+>
+    <main class="home">
+
+        <!-- HERO -->
+        <section class="home-hero">
+            <div class="container">
+                <div class="hero-grid">
+
+                    <div class="hero-content">
+                        <div class="eyebrow">
+                            Zero dependencies · Pure JavaScript
+                        </div>
+
+                        <h1>
+                            Data visualization
+                            <span>without the baggage.</span>
+                        </h1>
+
+                        <p class="hero-description">
+                            Datum is a lightweight, layer-based visualization
+                            library for building rich, interactive charts with
+                            vanilla JavaScript.
+                        </p>
+
+                        <div class="hero-actions">
+                            <a
+                                class="button button-primary"
+                                href="/docs/quick-start"
+                            >
+                                Get started
+                                <span aria-hidden="true">→</span>
+                            </a>
+
+                            <!--<a
+                                class="button button-secondary"
+                                href="/examples">Explore examples</a>-->
+                        </div>
+
+                        <div class="hero-install">
+                            <span class="hero-install-prompt">$</span>
+                            <code>npm i @psdpainter/datum-js</code>
+
+                            <button
+                                type="button"
+                                class="hero-copy"
+                                data-copy-install
+                                aria-label="Copy npm install command"
+                            >
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="hero-visual" aria-hidden="true">
+                        <div class="hero-grid-pattern"></div>
+
+                        <svg
+                            class="hero-line"
+                            viewBox="0 0 600 300"
+                            preserveAspectRatio="none"
+                        >
+                            <defs>
+                                <linearGradient
+                                    id="heroArea"
+                                    x1="0"
+                                    y1="0"
+                                    x2="0"
+                                    y2="1"
+                                >
+                                    <stop
+                                        offset="0%"
+                                        stop-color="currentColor"
+                                        stop-opacity=".28"
+                                    />
+                                    <stop
+                                        offset="100%"
+                                        stop-color="currentColor"
+                                        stop-opacity="0"
+                                    />
+                                </linearGradient>
+                            </defs>
+
+                            <path
+                                class="hero-area-path"
+                                d="
+                                    M 0 235
+                                    C 60 225, 90 175, 145 188
+                                    S 220 248, 270 173
+                                    S 355 94, 410 150
+                                    S 495 202, 600 78
+                                    L 600 300
+                                    L 0 300
+                                    Z
+                                "
+                            />
+
+                            <path
+                                class="hero-line-path"
+                                d="
+                                    M 0 235
+                                    C 60 225, 90 175, 145 188
+                                    S 220 248, 270 173
+                                    S 355 94, 410 150
+                                    S 495 202, 600 78
+                                "
+                            />
+
+                            <circle cx="270" cy="173" r="5" />
+                            <circle cx="410" cy="150" r="5" />
+                            <circle cx="600" cy="78" r="5" />
+                        </svg>
+
+                        <div class="hero-chart-label">
+                            <span></span>
+                            Compose. Visualize. Ship.
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- MAIN LIVE CHART -->
+                <div class="hero-chart-card">
+                    <div class="chart-card-header">
+                        <div class="chart-card-title">
+                            <span class="status-dot"></span>
+                            Interactive visualization
+                        </div>
+
+                        <div class="chart-card-meta">
+                            LIVE DATUM
+                        </div>
+                    </div>
+
+                    <div
+                        id="home-chart"
+                        class="home-chart"
+                    ></div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- FOUNDATIONS -->
+        <section class="home-section">
+            <div class="container">
+
+                <div class="section-heading">
+                    <div class="eyebrow">Built for developers</div>
+
+                    <h2>
+                        Everything you need.<br />
+                        Nothing you don't.
+                    </h2>
+
+                    <p>
+                        Build expressive visualizations with a small,
+                        composable API and no external runtime dependencies.
+                    </p>
+                </div>
+
+                <div class="feature-grid">
+
+                    <article class="feature-card">
+                        <div class="feature-icon">⚡</div>
+
+                        <h3>Zero dependencies</h3>
+
+                        <p>
+                            Pure vanilla JavaScript with no external
+                            visualization framework required.
+                        </p>
+
+                        <span class="feature-detail">
+                            Lightweight by design
+                        </span>
+                    </article>
+
+
+                    <article class="feature-card">
+                        <div class="feature-icon">◇</div>
+
+                        <h3>Layer-based composition</h3>
+
+                        <p>
+                            Combine lines, areas, bars, dots, rulers and
+                            other layers inside a single visualization.
+                        </p>
+
+                        <a href="/docs/layers">
+                            Explore layers →
+                        </a>
+                    </article>
+
+
+                    <article class="feature-card">
+                        <div class="feature-icon">◉</div>
+
+                        <h3>Interactive by default</h3>
+
+                        <p>
+                            Crosshairs and tooltips provide coordinated
+                            context across composed data layers.
+                        </p>
+
+                        <a href="/docs">
+                            View documentation →
+                        </a>
+                    </article>
+
+
+                    <article class="feature-card">
+                        <div class="feature-icon">⌁</div>
+
+                        <h3>Flexible data</h3>
+
+                        <p>
+                            Work directly with primitive arrays or map
+                            object properties to visualization dimensions.
+                        </p>
+
+                        <a href="/docs/data">
+                            Data options →
+                        </a>
+                    </article>
+
+
+                    <article class="feature-card">
+                        <div class="feature-icon">&#123; &#125;</div>
+
+                        <h3>Native ES modules</h3>
+
+                        <p>
+                            Import only what you need with a modern,
+                            straightforward JavaScript API.
+                        </p>
+
+                        <span class="feature-detail">
+                            Built for modern browsers
+                        </span>
+                    </article>
+
+
+                    <article class="feature-card">
+                        <div class="feature-icon">Σ</div>
+
+                        <h3>Statistics included</h3>
+
+                        <p>
+                            Common statistical helpers live alongside
+                            the visualization API.
+                        </p>
+
+                        <a href="/docs/statistics">
+                            Explore statistics →
+                        </a>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- COMPOSITION -->
+        <section class="home-section home-composition">
+            <div class="container">
+
+                <div class="section-heading">
+                    <div class="eyebrow">Composable by design</div>
+
+                    <h2>
+                        Build charts by composition.
+                    </h2>
+
+                    <p>
+                        A Datum chart is a collection of independent layers.
+                        Add the visual primitives you need and let them share
+                        the same coordinate system.
+                    </p>
+                </div>
+
+                <div class="composition-grid">
+
+                    <div class="composition-code">
+
+                        <div class="code-window-header">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <div>composition.js</div>
+                        </div>
+
+                        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    datum: [
+        Datum.area(values, {
+            fill: Color.Blue,
+            opacity: 0.2
+        }),
+
+        Datum.line(values, {
+            stroke: Color.Blue,
+            smooth: true
+        }),
+
+        Datum.dot(values, {
+            stroke: Color.Blue,
+            fill: '#ffffff'
+        }),
+
+        Datum.ruler([], {
+            value: 25,
+            dashed: true
+        })
+    ]
+});`}</code></pre>
+
+                    </div>
+
+
+                    <div class="composition-preview">
+                        <div class="preview-header">
+                            <span>Composition preview</span>
+                            <span>4 layers</span>
+                        </div>
+
+                        <div
+                            id="composition-chart"
+                            class="composition-chart"
+                        ></div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- LAYERS -->
+        <section class="home-section home-layers">
+            <div class="container">
+
+                <div class="section-heading section-heading-row">
+                    <div>
+                        <div class="eyebrow">Visualization layers</div>
+                        <h2>Use the right primitive.</h2>
+                    </div>
+
+                    <a
+                        class="section-link"
+                        href="/docs/layers"
+                    >
+                        View all layers →
+                    </a>
+                </div>
+
+                <div class="layer-grid">
+                    <a href="/docs/layers/line">Line</a>
+                    <a href="/docs/layers/area">Area</a>
+                    <a href="/docs/layers/bar">Bar</a>
+                    <a href="/docs/layers/dot">Dot</a>
+                    <a href="/docs/layers/histogram">Histogram</a>
+                    <a href="/docs/layers/scatter">Scatter</a>
+                    <a href="/docs/layers/candlestick">Candlestick</a>
+                    <a href="/docs/layers/ruler">Ruler</a>
+                    <a href="/docs/layers/range">Range</a>
+                    <a href="/docs/layers/heatmap">Heatmap</a>
+                    <a href="/docs/layers/pie">Pie</a>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- GET STARTED -->
+        <section class="home-section home-get-started">
+            <div class="container">
+
+                <div class="get-started-card">
+
+                    <div>
+                        <div class="eyebrow">Ready to build?</div>
+
+                        <h2>Start creating with Datum.</h2>
+
+                        <p>
+                            Install Datum and create your first visualization
+                            in a few lines of JavaScript.
+                        </p>
+
+                        <div class="hero-actions">
+                            <a
+                                class="button button-primary"
+                                href="/docs/quick-start"
+                            >
+                                Get started →
+                            </a>
+
+                            <!--<a
+                                class="button button-secondary"
+                                href="https://github.com/psdpainter/datum"
+                            >View on GitHub</a>-->
+                        </div>
+                    </div>
+
+                    <div class="get-started-pattern" aria-hidden="true"></div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+</BaseLayout>
+
+
+<script>
+    import {
+        Datum,
+        Color
+    } from '@psdpainter/datum-js';
+
+    const values = [
+        18,
+        25,
+        22,
+        36,
+        31,
+        44,
+        40,
+        52,
+        48,
+        61,
+        58,
+        72
+    ];
+
+    Datum.chart({
+        target: '#home-chart',
+        height: 360,
+
+        datum: [
+            Datum.area(values, {
+                fill: Color.Green,
+                opacity: 0.18,
+                gradient: true,
+                smooth: true
+            }),
+
+            Datum.line(values, {
+                name: 'Activity',
+                stroke: Color.Green,
+                strokeWidth: 2,
+                smooth: true
+            }),
+
+            Datum.dot(values, {
+                stroke: Color.Green,
+                fill: '#0c111b',
+                strokeWidth: 2,
+                radius: 4
+            })
+        ]
+    });
+
+
+    const compositionValues = [
+        18,
+        28,
+        22,
+        37,
+        30,
+        43,
+        38
+    ];
+
+    Datum.chart({
+        target: '#composition-chart',
+        height: 330,
+
+        datum: [
+            Datum.area(compositionValues, {
+                fill: Color.Blue,
+                opacity: 0.18,
+                gradient: true,
+                smooth: true
+            }),
+
+            Datum.line(compositionValues, {
+                stroke: Color.Blue,
+                strokeWidth: 2,
+                smooth: true
+            }),
+
+            Datum.dot(compositionValues, {
+                stroke: Color.Blue,
+                fill: '#101722',
+                radius: 4
+            }),
+
+            Datum.ruler([], {
+                value: 25,
+                dashed: true
+            })
+        ]
+    });
+
+
+    document
+        .querySelector('[data-copy-install]')
+        ?.addEventListener('click', async (event) => {
+            await navigator.clipboard.writeText(
+                'npm i @psdpainter/datum-js'
+            );
+
+            const button = event.currentTarget;
+
+            if (button instanceof HTMLButtonElement) {
+                const original = button.textContent;
+
+                button.textContent = 'Copied';
+
+                window.setTimeout(() => {
+                    button.textContent = original;
+                }, 1500);
+            }
+        });
+</script>

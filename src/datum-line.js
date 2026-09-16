@@ -6,30 +6,101 @@ const DEFAULT_OPTIONS = {
   strokeWidth: 2,
   stroke: null,
   smooth: false,
-  tension: 0.2 // Curve smoothing tension (0.1 to 0.3 offers natural curves)
+  tension: 0.2
 };
 
-// Generates smooth cubic Bezier path coordinates between points
+// Generates a smooth monotone cubic Bezier path between points.
+// The curve avoids introducing artificial minima or maxima between
+// adjacent data points.
 function buildSmoothPath(points, tension = 0.2) {
   if (points.length === 0) return '';
-  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
-  if (points.length === 2) return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
+  if (points.length === 1) {
+    return `M ${points[0].x} ${points[0].y}`;
+  }
+  if (points.length === 2) {
+    return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
+  }
+
+  const slopes = [];
+
+  // Calculate the slope of each segment.
+  for (let i = 0; i < points.length - 1; i++) {
+    const dx = points[i + 1].x - points[i].x;
+    const dy = points[i + 1].y - points[i].y;
+
+    slopes.push(dx === 0 ? 0 : dy / dx);
+  }
+
+  const tangents = new Array(points.length);
+
+  // Endpoints follow the slope of their adjacent segment.
+  tangents[0] = slopes[0];
+  tangents[points.length - 1] = slopes[slopes.length - 1];
+
+  // Interior tangents use the average of neighboring slopes,
+  // but flatten at local extrema.
+  for (let i = 1; i < points.length - 1; i++) {
+    const previous = slopes[i - 1];
+    const next = slopes[i];
+
+    if (
+      previous === 0 ||
+      next === 0 ||
+      Math.sign(previous) !== Math.sign(next)
+    ) {
+      tangents[i] = 0;
+    } else {
+      tangents[i] = (previous + next) / 2;
+    }
+  }
+
+  // Limit tangents so the cubic curve remains monotonic within
+  // each segment and does not overshoot the source values.
+  for (let i = 0; i < slopes.length; i++) {
+    const slope = slopes[i];
+
+    if (slope === 0) {
+      tangents[i] = 0;
+      tangents[i + 1] = 0;
+      continue;
+    }
+
+    const a = tangents[i] / slope;
+    const b = tangents[i + 1] / slope;
+    const magnitude = Math.hypot(a, b);
+
+    if (magnitude > 3) {
+      const scale = 3 / magnitude;
+
+      tangents[i] = scale * a * slope;
+      tangents[i + 1] = scale * b * slope;
+    }
+  }
+
+  // Preserve the existing tension option. A tension of 0.2 represents
+  // the normal monotone curve; lower values reduce curvature while
+  // higher values increase it.
+  const tensionScale = Math.max(0, tension) / 0.2;
 
   let d = `M ${points[0].x} ${points[0].y}`;
 
   for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i === 0 ? i : i - 1];
     const p1 = points[i];
     const p2 = points[i + 1];
-    const p3 = points[i + 2] || p2;
+    const dx = p2.x - p1.x;
 
-    // Calculate tangent-based control points
-    const cp1x = p1.x + (p2.x - p0.x) * tension;
-    const cp1y = p1.y + (p2.y - p0.y) * tension;
-    const cp2x = p2.x - (p3.x - p1.x) * tension;
-    const cp2y = p2.y - (p3.y - p1.y) * tension;
+    const cp1x = p1.x + dx / 3;
+    const cp1y =
+      p1.y + (tangents[i] * dx / 3) * tensionScale;
 
-    d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+    const cp2x = p2.x - dx / 3;
+    const cp2y =
+      p2.y - (tangents[i + 1] * dx / 3) * tensionScale;
+
+    d +=
+      ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)},` +
+      ` ${cp2x.toFixed(2)} ${cp2y.toFixed(2)},` +
+      ` ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
   }
 
   return d;
@@ -47,11 +118,16 @@ export function line(data = [], keysAndOptions = {}) {
     tooltip
   } = keysAndOptions;
 
-  // Normalize primitive numeric arrays: [10, 20] -> [{ x: 1, y: 10 }, { x: 2, y: 20 }]
+  // Normalize primitive numeric arrays:
+  // [10, 20] -> [{ x: 1, y: 10 }, { x: 2, y: 20 }]
   const normalizedData = (data || []).map((item, index) => {
     if (typeof item === 'number') {
-      return { [x]: index + 1, [y]: item };
+      return {
+        [x]: index + 1,
+        [y]: item
+      };
     }
+
     return item;
   });
 
@@ -59,7 +135,14 @@ export function line(data = [], keysAndOptions = {}) {
     type: 'line',
     data: normalizedData,
     keys: { x, y },
-    options: { stroke, strokeWidth, smooth, tension, name, tooltip }
+    options: {
+      stroke,
+      strokeWidth,
+      smooth,
+      tension,
+      name,
+      tooltip
+    }
   };
 }
 
@@ -69,11 +152,14 @@ export function renderLineLayer(layer, context, layerIndex = 0) {
 
   if (!data || data.length === 0) return;
 
-  const fallbackColor = DEFAULT_SERIES_COLORS[layerIndex % DEFAULT_SERIES_COLORS.length];
-  const color = options.stroke || fallbackColor;
-  const strokeWidth = options.strokeWidth ?? DEFAULT_OPTIONS.strokeWidth;
+  const fallbackColor =
+    DEFAULT_SERIES_COLORS[layerIndex % DEFAULT_SERIES_COLORS.length];
 
-  // Resolve 2D coordinate points
+  const color = options.stroke || fallbackColor;
+  const strokeWidth =
+    options.strokeWidth ?? DEFAULT_OPTIONS.strokeWidth;
+
+  // Resolve 2D coordinate points.
   const points = data.map((d, index) => ({
     x: getX(index, data.length),
     y: getY(Number(d[keys.y]) || 0)
@@ -84,18 +170,23 @@ export function renderLineLayer(layer, context, layerIndex = 0) {
   if (options.smooth) {
     pathString = buildSmoothPath(points, options.tension);
   } else {
-    // Standard linear segments
+    // Standard linear segments.
     points.forEach((pt, index) => {
-      pathString += (index === 0 ? 'M' : ' L') + ` ${pt.x} ${pt.y}`;
+      pathString +=
+        (index === 0 ? 'M' : ' L') +
+        ` ${pt.x} ${pt.y}`;
     });
   }
 
-  const linePath = document.createElementNS(SVG_NS, 'path');
+  const linePath =
+    document.createElementNS(SVG_NS, 'path');
+
   linePath.setAttribute('d', pathString.trim());
   linePath.setAttribute('fill', 'none');
   linePath.setAttribute('stroke', color);
   linePath.setAttribute('stroke-width', strokeWidth);
   linePath.setAttribute('stroke-linejoin', 'round');
   linePath.setAttribute('stroke-linecap', 'round');
+
   svg.appendChild(linePath);
 }

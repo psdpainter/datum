@@ -1,0 +1,232 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-heatmap.js?raw';
+---
+
+<DocsLayout
+    title="Heatmap"
+    description="Visualize values across two dimensions with heatmap layers in Datum."
+>
+    <h1>Heatmap</h1>
+
+    <p class="docs-lead">
+        Heatmap layers display values across two dimensions using color
+        intensity, making it easy to identify patterns, concentrations,
+        and differences across categories.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Pass an array of objects to <code>Datum.heatmap()</code>
+            and identify the properties containing the X category,
+            Y category, and cell value.
+        </p>
+
+        <DatumDemo
+            id="heatmap-example"
+            title="Heatmap"
+            description="Values across days and times represented using color intensity."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.heatmap(data, {
+    x,
+    y,
+    value,
+    minColor,
+    maxColor,
+    stroke,
+    strokeWidth,
+    rx,
+    showValues,
+    valueColor,
+    tooltip
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data</h2>
+
+        <p>
+            By default, Datum expects each cell to contain
+            <code>x</code>, <code>y</code>, and <code>value</code>
+            properties.
+        </p>
+
+        <pre><code>{`const values = [
+    { x: 'Mon', y: 'Morning', value: 18 },
+    { x: 'Tue', y: 'Morning', value: 32 },
+    { x: 'Wed', y: 'Morning', value: 24 },
+    { x: 'Mon', y: 'Afternoon', value: 38 },
+    { x: 'Tue', y: 'Afternoon', value: 52 },
+    { x: 'Wed', y: 'Afternoon', value: 47 }
+];
+
+Datum.heatmap(values);`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data keys</h2>
+
+        <p>
+            Use <code>x</code>, <code>y</code>, and <code>value</code>
+            to map custom property names.
+        </p>
+
+        <pre><code>{`const values = [
+    { day: 'Mon', hour: '9 AM', activity: 18 },
+    { day: 'Tue', hour: '9 AM', activity: 32 },
+    { day: 'Wed', hour: '9 AM', activity: 24 }
+];
+
+Datum.heatmap(values, {
+    x: 'day',
+    y: 'hour',
+    value: 'activity'
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Matrix data</h2>
+
+        <p>
+            Heatmaps can also be created from a two-dimensional array
+            of numeric values.
+        </p>
+
+        <pre><code>{`const values = [
+    [18, 32, 24],
+    [38, 52, 47],
+    [27, 45, 61]
+];
+
+Datum.heatmap(values);`}</code></pre>
+
+        <p>
+            Datum automatically converts matrix rows and columns into
+            Y and X positions beginning with <code>1</code>.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Color range</h2>
+
+        <p>
+            Use <code>minColor</code> and <code>maxColor</code> to
+            control the color range used to represent cell values.
+        </p>
+
+        <pre><code>{`Datum.heatmap(values, {
+    minColor: '#e0f2fe',
+    maxColor: Color.Blue
+});`}</code></pre>
+
+        <p>
+            Values between the minimum and maximum are automatically
+            interpolated between the two colors.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Values</h2>
+
+        <p>
+            Set <code>showValues</code> to <code>true</code> to display
+            the numeric value in the center of each cell.
+        </p>
+
+        <pre><code>{`Datum.heatmap(values, {
+    showValues: true
+});`}</code></pre>
+
+        <p>
+            Use <code>valueColor</code> to control the text color used
+            on lighter cells.
+        </p>
+
+        <pre><code>{`Datum.heatmap(values, {
+    showValues: true,
+    valueColor: '#1e293b'
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Cell styling</h2>
+
+        <p>
+            Use <code>stroke</code>, <code>strokeWidth</code>, and
+            <code>rx</code> to customize the appearance of individual
+            heatmap cells.
+        </p>
+
+        <pre><code>{`Datum.heatmap(values, {
+    stroke: '#ffffff',
+    strokeWidth: 2,
+    rx: 3
+});`}</code></pre>
+
+        <p>
+            The <code>rx</code> option controls the corner radius of
+            each cell.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Tooltips</h2>
+
+        <p>
+            Heatmap cells support discrete tooltips containing the
+            cell coordinates and value.
+        </p>
+
+        <p>
+            Tooltips can be disabled for the layer with
+            <code>tooltip: false</code>.
+        </p>
+
+        <pre><code>{`Datum.heatmap(values, {
+    tooltip: false
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    x: 'x',
+    y: 'y',
+    value: 'value',
+    minColor: '#e0f2fe',
+    maxColor: Color.Blue,
+    stroke: '#ffffff',
+    strokeWidth: 2,
+    rx: 3,
+    showValues: false,
+    valueColor: '#1e293b',
+    tooltip: null
+}`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-heatmap.js';
+</script>

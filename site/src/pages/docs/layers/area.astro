@@ -1,0 +1,261 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import DatumDemo from '../../../components/DatumDemo.astro';
+import exampleCode from '../../../examples/layers-area.js?raw';
+---
+
+<DocsLayout
+    title="Area"
+    description="Create area layers with Datum and configure fills, opacity, gradients and smoothing."
+>
+    <h1>Area</h1>
+
+    <p class="docs-lead">
+        Area layers visualize a series of values as a filled region
+        extending from the data points to the chart baseline. They are
+        useful for emphasizing magnitude while preserving the shape of
+        a series.
+    </p>
+
+
+    <section class="docs-section">
+        <h2>Basic usage</h2>
+
+        <p>
+            Create an area layer with <code>Datum.area()</code>. Pass
+            the data as the first argument and area options as the
+            second.
+        </p>
+
+        <DatumDemo
+            id="area-example"
+            title="Area chart"
+            description="A smoothed area with a vertical gradient fill."
+            code={exampleCode}
+        />
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Syntax</h2>
+
+        <pre><code>{`Datum.area(data, {
+    x,
+    y,
+    fill,
+    opacity,
+    gradient,
+    smooth,
+    tension,
+    name,
+    tooltip
+});`}</code></pre>
+
+        <p>
+            <code>Datum.area()</code> creates a layer definition that
+            can be included in the <code>datum</code> array passed to
+            <code>Datum.chart()</code>.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Data keys</h2>
+
+        <p>
+            Area layers use <code>x</code> and <code>y</code> as their
+            default data-property names. Use the corresponding options
+            when your objects use different property names.
+        </p>
+
+        <pre><code>{`const sales = [
+    { month: 'Jan', revenue: 18 },
+    { month: 'Feb', revenue: 26 },
+    { month: 'Mar', revenue: 22 }
+];
+
+Datum.area(sales, {
+    x: 'month',
+    y: 'revenue'
+});`}</code></pre>
+
+        <p>
+            Numeric arrays are also supported. Datum assigns sequential
+            X categories beginning at 1.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Fill</h2>
+
+        <p>
+            Use <code>fill</code> to control the color of the area.
+            When no fill is supplied, Datum selects a color from its
+            default area palette.
+        </p>
+
+        <pre><code>{`Datum.area(values, {
+    fill: Color.Blue
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Opacity</h2>
+
+        <p>
+            Use <code>opacity</code> to control the transparency of
+            the filled area. The default value is <code>0.25</code>.
+        </p>
+
+        <pre><code>{`Datum.area(values, {
+    fill: Color.Blue,
+    opacity: 0.35
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Gradient</h2>
+
+        <p>
+            Set <code>gradient</code> to <code>true</code> to replace
+            the solid fill with a vertical gradient based on the
+            area's fill color.
+        </p>
+
+        <pre><code>{`Datum.area(values, {
+    fill: Color.Blue,
+    opacity: 0.35,
+    gradient: true
+});`}</code></pre>
+
+        <p>
+            The gradient begins with the configured fill color and
+            opacity and fades vertically toward transparency.
+        </p>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Smoothing</h2>
+
+        <p>
+            Area boundaries use straight segments by default. Set
+            <code>smooth</code> to <code>true</code> to create a
+            smooth cubic Bézier boundary between points.
+        </p>
+
+        <pre><code>{`Datum.area(values, {
+    smooth: true
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Tension</h2>
+
+        <p>
+            The <code>tension</code> option controls the shape of the
+            smoothed boundary. Its default value is <code>0.2</code>
+            and only affects the area when <code>smooth</code> is
+            enabled.
+        </p>
+
+        <pre><code>{`Datum.area(values, {
+    smooth: true,
+    tension: 0.2
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Series name</h2>
+
+        <p>
+            Use <code>name</code> to provide a meaningful label for
+            the area series. Datum uses the name when displaying the
+            layer in the chart legend.
+        </p>
+
+        <pre><code>{`Datum.area(values, {
+    name: 'Sessions',
+    fill: Color.Blue
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Tooltips</h2>
+
+        <p>
+            Area layers participate in the chart's shared tooltip and
+            crosshair interaction by default.
+        </p>
+
+        <p>
+            Set <code>tooltip</code> to <code>false</code> to exclude
+            the layer from tooltip interaction.
+        </p>
+
+        <pre><code>{`Datum.area(values, {
+    tooltip: false
+});`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Options</h2>
+
+        <pre><code>{`{
+    x: 'x',
+    y: 'y',
+    fill: undefined,
+    opacity: 0.25,
+    gradient: false,
+    smooth: false,
+    tension: 0.2,
+    name: undefined,
+    tooltip: undefined
+}`}</code></pre>
+    </section>
+
+
+    <section class="docs-section">
+        <h2>Composing with other layers</h2>
+
+        <p>
+            Area layers are commonly placed behind line and dot layers.
+            Because Datum renders layers in array order, placing the
+            area first allows the line and points to render above it.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+
+    datum: [
+        Datum.area(values, {
+            fill: Color.LightBlue,
+            opacity: 0.2
+        }),
+
+        Datum.line(values, {
+            stroke: Color.Blue,
+            strokeWidth: 2
+        }),
+
+        Datum.dot(values, {
+            stroke: Color.Blue,
+            fill: '#ffffff'
+        })
+    ]
+});`}</code></pre>
+    </section>
+
+</DocsLayout>
+
+
+<script>
+    import '../../../examples/layers-area.js';
+</script>
