@@ -1,6 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/home.css';
+
+const compositionStory = [
+    { id: 'area', title: 'Area · See the shape of demand', description: 'A blue gradient grounds the chart in hourly demand. Its filled silhouette makes the evening surge easy to spot while leaving the other series visible.', color: '#2196f3' },
+    { id: 'demand', title: 'Line · Follow demand', description: 'The blue line traces the same 24 readings as the area. Its crisp edge lets you compare demand precisely against generation and the forecast.', color: '#2196f3' },
+    { id: 'generation', title: 'Line · Compare generation', description: 'The green line shows supply climbing through the day and falling toward evening. Where it crosses demand, the balance shifts from surplus to shortfall.', color: '#4caf50' },
+    { id: 'forecast', title: 'Line · Check the forecast', description: 'The purple line adds an expected demand curve. Compare it with actual demand to see where the evening peak exceeds expectations.', color: '#9c27b0' },
+    { id: 'ruler', title: 'Ruler · Keep a reference in view', description: 'A dashed orange ruler stays at 60 across all 24 hours. This shared reference makes it easy to see which series sit above or below the target.', color: '#ff9800' }
+];
 ---
 
 <BaseLayout
@@ -288,6 +296,40 @@ import '../styles/home.css';
 
                 <div class="composition-grid">
 
+                    <div class="composition-preview">
+                        <div class="preview-header">
+                            <span>Energy balance · 24 hours · target 60</span>
+                            <span>5 layers</span>
+                        </div>
+
+                        <div
+                            id="composition-chart"
+                            class="composition-chart"
+                        ></div>
+                    </div>
+
+                    <div class="composition-detail">
+                        <div class="composition-story">
+                            <div class="eyebrow">Reading the layers</div>
+                            <h3>A day of shifting energy.</h3>
+                            <p>Demand peaks as generation fades. Five layers tell the story on one shared axis.</p>
+                            {compositionStory.map((layer, index) => (
+                                <div class="composition-layer" style={`--layer-color: ${layer.color}`}>
+                                    <h4>
+                                        <button type="button" data-layer={layer.id} aria-expanded={index === 0 ? 'true' : 'false'} aria-controls={`story-${layer.id}`} id={`toggle-${layer.id}`}>
+                                            <span class="layer-swatch" aria-hidden="true"></span>
+                                            {layer.title}
+                                            <span class="layer-toggle" aria-hidden="true">+</span>
+                                        </button>
+                                    </h4>
+                                    <div class="layer-panel" id={`story-${layer.id}`} role="region" aria-labelledby={`toggle-${layer.id}`} inert={index !== 0}>
+                                        <div>
+                                            <p>{layer.description}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     <div class="composition-code">
 
                         <div class="code-window-header">
@@ -298,45 +340,34 @@ import '../styles/home.css';
                             <div>composition.js</div>
                         </div>
 
-                        <pre><code>{`Datum.chart({
+                        <pre data-composition-code><code>{`// 24 hourly readings per series
+Datum.chart({
     target: '#chart',
 
     datum: [
-        Datum.area(values, {
+`}<span id="code-area" class="composition-code-layer">{`        Datum.area(demand, {
             fill: Color.Blue,
-            opacity: 0.2
-        }),
-
-        Datum.line(values, {
-            stroke: Color.Blue,
-            smooth: true
-        }),
-
-        Datum.dot(values, {
-            stroke: Color.Blue,
-            fill: '#ffffff'
-        }),
-
-        Datum.ruler([], {
-            value: 25,
+            opacity: 0.18,
+            gradient: true
+        }),`}</span>{'\n\n'}<span id="code-demand" class="composition-code-layer">{`        Datum.line(demand, {
+            name: 'Demand',
+            stroke: Color.Blue
+        }),`}</span>{'\n\n'}<span id="code-generation" class="composition-code-layer">{`        Datum.line(generation, {
+            name: 'Generation',
+            stroke: Color.Green
+        }),`}</span>{'\n\n'}<span id="code-forecast" class="composition-code-layer">{`        Datum.line(forecast, {
+            name: 'Forecast',
+            stroke: Color.Purple
+        }),`}</span>{'\n\n'}<span id="code-ruler" class="composition-code-layer">{`        Datum.ruler([], {
+            value: 60,
+            stroke: Color.Orange,
             dashed: true
-        })
+        })`}</span>{`
     ]
 });`}</code></pre>
 
                     </div>
 
-
-                    <div class="composition-preview">
-                        <div class="preview-header">
-                            <span>Composition preview</span>
-                            <span>4 layers</span>
-                        </div>
-
-                        <div
-                            id="composition-chart"
-                            class="composition-chart"
-                        ></div>
                     </div>
 
                 </div>
@@ -472,14 +503,22 @@ import '../styles/home.css';
     });
 
 
-    const compositionValues = [
-        18,
-        28,
-        22,
-        37,
-        30,
-        43,
-        38
+    const demand = [
+        32, 29, 27, 26, 28, 34, 45, 58,
+        65, 62, 57, 54, 56, 61, 64, 68,
+        75, 82, 78, 70, 61, 50, 42, 36
+    ];
+
+    const generation = [
+        44, 43, 42, 42, 43, 45, 48, 52,
+        58, 66, 74, 79, 82, 80, 76, 70,
+        63, 57, 53, 50, 48, 47, 46, 45
+    ];
+
+    const forecast = [
+        34, 31, 29, 28, 30, 36, 43, 53,
+        59, 61, 60, 58, 59, 62, 66, 70,
+        73, 76, 74, 67, 58, 49, 41, 35
     ];
 
     Datum.chart({
@@ -487,30 +526,66 @@ import '../styles/home.css';
         height: 330,
 
         datum: [
-            Datum.area(compositionValues, {
+            Datum.area(demand, {
                 fill: Color.Blue,
                 opacity: 0.18,
-                gradient: true,
-                smooth: true
+                gradient: true
             }),
 
-            Datum.line(compositionValues, {
+            Datum.line(demand, {
+                name: 'Demand',
                 stroke: Color.Blue,
-                strokeWidth: 2,
-                smooth: true
+                strokeWidth: 2
             }),
 
-            Datum.dot(compositionValues, {
-                stroke: Color.Blue,
-                fill: '#101722',
-                radius: 4
+            Datum.line(generation, {
+                name: 'Generation',
+                stroke: Color.Green,
+                strokeWidth: 2
+            }),
+
+            Datum.line(forecast, {
+                name: 'Forecast',
+                stroke: Color.Purple,
+                strokeWidth: 2
             }),
 
             Datum.ruler([], {
-                value: 25,
+                value: 60,
+                stroke: Color.Orange,
                 dashed: true
             })
         ]
+    });
+
+
+    const codeWindow = document.querySelector('[data-composition-code]');
+    const layerButtons = document.querySelectorAll('[data-layer]');
+
+    function focusCode(layer) {
+        const target = document.getElementById(`code-${layer}`);
+        if (!(codeWindow instanceof HTMLElement) || !target) return;
+        document.querySelectorAll('.composition-code-layer').forEach((section) => {
+            section.classList.toggle('is-active', section === target);
+        });
+        const top = target.getBoundingClientRect().top - codeWindow.getBoundingClientRect().top + codeWindow.scrollTop - 22;
+        codeWindow.scrollTo({
+            top,
+            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'
+        });
+    }
+
+    layerButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const expanded = button.getAttribute('aria-expanded') !== 'true';
+            layerButtons.forEach((other) => {
+                const open = other === button && expanded;
+                other.setAttribute('aria-expanded', String(open));
+                const panel = document.getElementById(other.getAttribute('aria-controls'));
+                if (panel) panel.inert = !open;
+            });
+            focusCode(button.getAttribute('data-layer'));
+        });
     });
 
 
