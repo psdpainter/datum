@@ -1,5 +1,5 @@
 # Datum
-Data visualization library for enterprise web apps. STILL UNDER DEVELOPMENT.
+Data visualization library for web apps.
 
 # Instructions
 No installation. Include from [https://www.npmjs.com/package/@psdpainter/datum-js](https://www.npmjs.com/package/@psdpainter/datum-js).
