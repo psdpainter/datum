@@ -46,9 +46,13 @@ export function renderBarLayer(layer, context, barMeta) {
   if (!data || data.length === 0) return;
 
   const fallbackColor = DEFAULT_SERIES_COLORS[barIndex % DEFAULT_SERIES_COLORS.length];
-  const fillColor = options.fill || fallbackColor;
+  layer.resolvedFillColors = [];
 
   data.forEach((d, catIndex) => {
+    const fillColor = (typeof options.fill === 'function'
+      ? options.fill(d, catIndex, data)
+      : options.fill) || fallbackColor;
+    layer.resolvedFillColors[catIndex] = fillColor;
     const band = getBand(catIndex);
     const rawVal = Number(d[keys.y]) || 0;
 

@@ -22,6 +22,10 @@ function resolveSeriesColor(layer, fallbackIndex = 0) {
   const opts = layer.options || {};
   const defaultFallback = PALETTE[fallbackIndex % PALETTE.length];
 
+  if (layer.type === 'bar' && layer.resolvedFillColors?.length) {
+    return layer.resolvedFillColors[0];
+  }
+
   if (layer.type === 'line' && opts.stroke && !isBlankColor(opts.stroke)) return opts.stroke;
   if ((layer.type === 'dot' || layer.type === 'scatter') && opts.stroke && isBlankColor(opts.fill)) return opts.stroke;
   if (opts.fill && typeof opts.fill === 'string' && !isBlankColor(opts.fill)) return opts.fill;

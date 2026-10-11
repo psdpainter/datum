@@ -88,12 +88,7 @@ export const Datum = {
     const isPolar = layers.some(l => l.type === 'pie');
     const isHeatmap = layers.some(l => l.type === 'heatmap');
 
-    const showLegend = config.legend !== false && (
-      config.legend?.show ?? (
-        layers.length > 1 || 
-        layers.some(l => l.type === 'pie' || Boolean(l.options?.name))
-      )
-    );
+    const showLegend = config.legend !== false && (config.legend?.show ?? true);
 
     let xCategories = [];
     let yCategories = [];

@@ -29,8 +29,9 @@ Datum.chart({
     Datum.bar(aaplStock, { 
       x: 'day', 
       y: 'open', 
-      fill: Color.Magenta,
-      opacity: 0.5
+      fill: (d) => {
+        return d.close > d.open ? Color.Green : Color.Red
+      }
     }),
   ]
 });
@@ -76,7 +77,7 @@ Datum.chart({
   animated: true,
   datum: [
     Datum.bar(numbers, {
-      fill: Color.Amber
+      fill: (d) => d.y > 20 ? Color.Red : Color.Green
     })
   ]
 });

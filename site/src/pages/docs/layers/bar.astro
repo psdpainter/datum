@@ -92,6 +92,20 @@ Datum.bar(sales, {
             palette.
         </p>
 
+        <p>
+            For individual bar colors, pass <code>fill: (d, i, data) =&gt; color</code>.
+            The callback receives the current data object, its zero-based index,
+            and the complete normalized series array. Object inputs retain their
+            properties; numeric inputs become objects such as <code>{'{ x: 1, y: 42 }'}</code>.
+            A missing callback result uses the default series color.
+        </p>
+
+        <pre><code>{`Datum.bar(sales, {
+    x: 'month',
+    y: 'revenue',
+    fill: (d, i, data) => d.revenue > 20 ? Color.Red : Color.Green
+});`}</code></pre>
+
         <pre><code>{`Datum.bar(values, {
     fill: Color.Blue
 });`}</code></pre>

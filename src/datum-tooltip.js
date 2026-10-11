@@ -248,6 +248,9 @@ export function setupCrosshairOverlay(context) {
 
       const layerName = layer.options?.name || layer.options?.label || `Series ${idx + 1}`;
       let layerColor = layer.options?.stroke || layer.options?.fill || '#38bdf8';
+      if (layer.type === 'bar') {
+        layerColor = layer.resolvedFillColors?.[closestIndex] || '#38bdf8';
+      }
 
       if (layer.type === 'candlestick') {
         const o = d[layer.keys.open];
