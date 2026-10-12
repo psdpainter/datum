@@ -52,15 +52,18 @@ Datum.chart({
   height: 380,
   animated: true,
   datum: [
+
     Datum.area(values, {
       fill: Color.LightGreen,
       opacity: 0.3,
       gradient: true
     }),
+
     Datum.line(values, {
       stroke: Color.Green,
       strokeWidth: 2
     }),
+
     Datum.dot(values, {
       stroke: Color.Green,
       fill: '#ffffff',
@@ -75,7 +78,7 @@ Datum.chart({
 Datum accepts structured datasets and custom key mappings across mixed visual types:
 
 ```js
-const quarterlyReport = [
+const data = [
   { quarter: 'Q1', revenue: 140, expenses: 90, target: 120 },
   { quarter: 'Q2', revenue: 190, expenses: 110, target: 160 },
   { quarter: 'Q3', revenue: 230, expenses: 140, target: 200 },
@@ -86,21 +89,24 @@ Datum.chart({
   target: '#chart',
   title: 'Financial Performance',
   datum: [
-    Datum.bar(quarterlyReport, {
+
+    Datum.bar(data, {
       x: 'quarter',
       y: 'revenue',
       fill: Color.Blue,
       name: 'Revenue'
     }),
-    Datum.bar(quarterlyReport, {
+
+    Datum.bar(data, {
       x: 'quarter',
       y: 'expenses',
       fill: Color.DeepOrange,
       name: 'Expenses'
     }),
-    Datum.ruler(quarterlyReport, {
+
+    Datum.ruler(data, {
       direction: 'horizontal',
-      value: Datum.mean(quarterlyReport, 'target'),
+      value: Datum.mean(data, 'target'),
       stroke: Color.Grey,
       dashed: true
     })
