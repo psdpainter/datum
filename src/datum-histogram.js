@@ -12,6 +12,7 @@ const DEFAULT_OPTIONS = {
 
 export function histogram(data = [], keysAndOptions = {}) {
   const {
+    name,
     bins = DEFAULT_OPTIONS.bins,
     fill,
     stroke = DEFAULT_OPTIONS.stroke,
@@ -52,7 +53,7 @@ export function histogram(data = [], keysAndOptions = {}) {
     type: 'histogram',
     data: binData,
     keys: { x: 'bin', y: 'count' },
-    options: { bins, fill, stroke, strokeWidth, rx, opacity }
+    options: { name, bins, fill, stroke, strokeWidth, rx, opacity }
   };
 }
 

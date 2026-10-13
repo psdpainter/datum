@@ -13,6 +13,7 @@ const DEFAULT_OPTIONS = {
 
 export function scatter(data = [], keysAndOptions = {}) {
   const {
+    name,
     x = 'x',
     y = 'y',
     radius = DEFAULT_OPTIONS.radius,
@@ -33,7 +34,7 @@ export function scatter(data = [], keysAndOptions = {}) {
     type: 'scatter',
     data: normalizedData,
     keys: { x, y },
-    options: { radius, fill, stroke, strokeWidth, opacity }
+    options: { name, radius, fill, stroke, strokeWidth, opacity }
   };
 }
 

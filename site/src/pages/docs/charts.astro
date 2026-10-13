@@ -143,6 +143,59 @@ import exampleCode from '../../examples/charts-basic.js?raw';
         <h2>Configuration</h2>
 
         <p>
+            Set the chart-level <code>resize: true</code> option to redraw when
+            its container width changes. The configured height stays fixed
+            (360 by default). Updates are batched per animation frame and ignore
+            subpixel width changes. Entrance animations run only on initial
+            render, and legend selections survive resizing. Call
+            <code>chart.destroy()</code> to disconnect the observer and remove
+            a responsive chart when it is no longer needed.
+        </p>
+
+        <pre><code>{`const chart = Datum.chart({
+    target: '#chart',
+    height: 380,
+    resize: true,
+    datum: [Datum.line(values)]
+});`}</code></pre>
+
+        <p>
+            Set <code>config.xAxis.min</code> and <code>config.xAxis.max</code>
+            to limit the X-axis. Numeric X categories and scatter charts use
+            numeric values; text categories use zero-based category positions.
+            Either bound may be omitted for automatic scaling. Bounds must be
+            finite numbers, with min less than max. Marks outside the plot are
+            clipped. Pie charts do not use these bounds.
+        </p>
+
+        <pre><code>{`config: {
+    xAxis: { min: 1, max: 20 },
+    yAxis: { min: 0, max: 100 }
+}`}</code></pre>
+
+        <p>
+            Set <code>config.yAxis.min</code> and <code>config.yAxis.max</code>
+            to fix the numeric Y-axis bounds. Either bound may be omitted to
+            retain automatic scaling for that side. Explicit bounds override
+            padding and the automatic zero baseline; marks outside the bounds
+            are clipped to the plot. These options apply to Cartesian charts,
+            rather than pie charts or categorical heatmap axes.
+        </p>
+
+        <pre><code>{`Datum.chart({
+    target: '#chart',
+    config: {
+        yAxis: { min: 0, max: 100 }
+    },
+    datum: [Datum.line(values)]
+});`}</code></pre>
+
+        <p>
+            Bounds must be finite numbers, with <code>min</code> less than
+            <code>max</code> when both are supplied.
+        </p>
+
+        <p>
             Additional chart behavior is configured through the
             <code>config</code> object.
         </p>

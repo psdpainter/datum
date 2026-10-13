@@ -12,6 +12,7 @@ const DEFAULT_OPTIONS = {
 
 export function candlestick(data = [], keysAndOptions = {}) {
   const {
+    name,
     x = 'x',
     open = 'open',
     high = 'high',
@@ -28,7 +29,7 @@ export function candlestick(data = [], keysAndOptions = {}) {
     type: 'candlestick',
     data,
     keys: { x, open, high, low, close },
-    options: { upColor, downColor, strokeWidth, rx, bodyRatio }
+    options: { name, upColor, downColor, strokeWidth, rx, bodyRatio }
   };
 }
 

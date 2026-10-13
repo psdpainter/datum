@@ -1,3 +1,4 @@
+import { observeChartResize } from './datum-resize.js';
 import { createBase } from './datum-core.js';
 import { line, renderLineLayer } from './datum-line.js';
 import { dot, renderDotLayer } from './datum-dot.js';
@@ -57,17 +58,27 @@ export const Datum = {
   mode,
 
   chart(options = {}) {
+    const base = renderChart(options);
+    if (options.resize === true) {
+      observeChartResize(base, () => renderChart(options, base));
+    }
+    return base;
+  }
+};
+
+function renderChart(options, existingBase) {
     const layers = Array.isArray(options.datum) ? options.datum : [];
     const chartTypes = layers.map(l => l.type).filter(Boolean).join(',');
 
     const config = options.config || {};
     const xAxisConfig = config.xAxis || {};
+    const yAxisConfig = config.yAxis || {};
     const userPadding = config.padding || {};
 
     const isTooltipDisabled = options.tooltip === false || config.tooltip === false;
     const tooltipConfig = options.tooltip !== undefined ? options.tooltip : config.tooltip;
 
-    const isAnimated = options.animated === true;
+    const isAnimated = options.animated === true && !existingBase;
     let resolvedAnimationDelay = '40ms';
 
     if (isAnimated) {
@@ -160,8 +171,23 @@ export const Datum = {
     const ySpan = (rawMaxY - rawMinY) || 1;
 
     const requiresZeroBaseline = layers.some(l => l.type === 'bar' || l.type === 'histogram');
-    const minY = requiresZeroBaseline ? Math.min(0, rawMinY) : Math.floor(rawMinY - ySpan * 0.05);
-    const maxY = Math.ceil(rawMaxY + ySpan * 0.05);
+    const autoMinY = requiresZeroBaseline ? Math.min(0, rawMinY) : Math.floor(rawMinY - ySpan * 0.05);
+    const autoMaxY = Math.ceil(rawMaxY + ySpan * 0.05);
+    const hasMinY = yAxisConfig.min !== undefined;
+    const hasMaxY = yAxisConfig.max !== undefined;
+    if ((hasMinY && !Number.isFinite(yAxisConfig.min)) ||
+        (hasMaxY && !Number.isFinite(yAxisConfig.max))) {
+      throw new TypeError('Datum: yAxis.min and yAxis.max must be finite numbers.');
+    }
+    let minY = hasMinY ? yAxisConfig.min : autoMinY;
+    let maxY = hasMaxY ? yAxisConfig.max : autoMaxY;
+    if (minY >= maxY) {
+      if (hasMinY && hasMaxY) {
+        throw new RangeError('Datum: yAxis.min must be less than yAxis.max.');
+      }
+      if (hasMinY) maxY = minY + ySpan;
+      else minY = maxY - ySpan;
+    }
 
     const heatMinVal = heatmapValues.length > 0 ? Math.min(...heatmapValues) : 0;
     const heatMaxVal = heatmapValues.length > 0 ? Math.max(...heatmapValues) : 100;
@@ -230,7 +256,18 @@ export const Datum = {
       left: dynamicLeftPadding
     };
 
-    const base = createBase(options);
+    const base = existingBase || createBase(options);
+    const hiddenLegendItems = existingBase
+      ? Array.from(base.svg.querySelectorAll('.datum-legend-item')).map(item =>
+          item.classList.contains('datum-legend-item-disabled'))
+      : [];
+    if (existingBase) {
+      base.svg.replaceChildren();
+      base.svg.setAttribute('viewBox', `0 0 ${base.width} ${base.height}`);
+      base.container.classList.remove('is-animated');
+      const tooltip = base.container.querySelector('.datum-tooltip');
+      if (tooltip) tooltip.style.display = 'none';
+    }
     const { svg, container, width, height } = base;
     svg.setAttribute('data-datum-chart-type', chartTypes || 'composite');
 
@@ -297,8 +334,41 @@ export const Datum = {
       return 0;
     };
 
+    const scatterLayers = layers.filter(layer => layer.type === 'scatter');
+    const isScatterOnly = scatterLayers.length > 0 && layers.every(layer => layer.type === 'scatter');
+    const hasMinX = xAxisConfig.min !== undefined;
+    const hasMaxX = xAxisConfig.max !== undefined;
+    const hasXBounds = hasMinX || hasMaxX;
+    if ((hasMinX && !Number.isFinite(xAxisConfig.min)) ||
+        (hasMaxX && !Number.isFinite(xAxisConfig.max))) {
+      throw new TypeError('Datum: xAxis.min and xAxis.max must be finite numbers.');
+    }
+    const numericCategories = xCategories.length > 0 &&
+      xCategories.every(value => value.trim() !== '' && Number.isFinite(Number(value)));
+    const scatterXValues = scatterLayers.flatMap(layer =>
+      layer.data.map(d => Number(d[layer.keys.x])).filter(Number.isFinite));
+    const domainXValues = isScatterOnly ? scatterXValues :
+      (numericCategories ? xCategories.map(Number) : xCategories.map((_, index) => index));
+    const autoMinX = domainXValues.length ? Math.min(...domainXValues) : 0;
+    const autoMaxX = domainXValues.length ? Math.max(...domainXValues) : 1;
+    const xSpan = autoMaxX - autoMinX || 1;
+    let minX = hasMinX ? xAxisConfig.min : autoMinX;
+    let maxX = hasMaxX ? xAxisConfig.max : autoMaxX;
+    if (minX >= maxX && hasXBounds) {
+      if (hasMinX && hasMaxX) {
+        throw new RangeError('Datum: xAxis.min must be less than xAxis.max.');
+      }
+      if (hasMinX) maxX = minX + xSpan;
+      else minX = maxX - xSpan;
+    }
+    const boundedSlotWidth = plotWidth / (maxX - minX + (hasBandLayer ? 1 : 0) || 1);
+    const getCategoryXValue = index => numericCategories ? Number(xCategories[index] ?? index) : index;
     const getX = (keyOrIndex, totalCount = xCategories.length) => {
       const idx = Math.max(0, resolveIndex(keyOrIndex, xCategories));
+      if (hasXBounds && !isPolar) {
+        return plotLeft + (getCategoryXValue(idx) - minX) * boundedSlotWidth +
+          (hasBandLayer ? boundedSlotWidth / 2 : 0);
+      }
       if (hasBandLayer) {
         const slotWidth = plotWidth / (totalCount || 1);
         return plotLeft + idx * slotWidth + slotWidth / 2;
@@ -306,28 +376,6 @@ export const Datum = {
       if (totalCount <= 1) return plotLeft + plotWidth / 2;
       return plotLeft + (idx / (totalCount - 1)) * plotWidth;
     };
-
-    const scatterLayers = layers.filter(
-        layer => layer.type === 'scatter'
-    );
-
-    const isScatterOnly =
-      scatterLayers.length > 0 &&
-      layers.every(layer => layer.type === 'scatter');
-
-    const scatterXValues = scatterLayers.flatMap(layer =>
-        layer.data
-            .map(d => Number(d[layer.keys.x]))
-            .filter(Number.isFinite)
-    );
-
-    const minX = scatterXValues.length
-        ? Math.min(...scatterXValues)
-        : 0;
-
-    const maxX = scatterXValues.length
-        ? Math.max(...scatterXValues)
-        : 1;
 
     const getNumericX = (value) => {
         const ratio = (value - minX) / (maxX - minX || 1);
@@ -337,10 +385,11 @@ export const Datum = {
 
     const getBand = (keyOrIndex, totalCount = xCategories.length) => {
       const idx = Math.max(0, resolveIndex(keyOrIndex, xCategories));
-      const slotWidth = plotWidth / (totalCount || 1);
+      const slotWidth = hasXBounds && !isPolar ? boundedSlotWidth : plotWidth / (totalCount || 1);
       const paddingRatio = isHeatmap ? 0.08 : 0.25;
       const usableWidth = slotWidth * (1 - paddingRatio);
-      const x = plotLeft + idx * slotWidth + (slotWidth * paddingRatio) / 2;
+      const slotIndex = hasXBounds && !isPolar ? getCategoryXValue(idx) - minX : idx;
+      const x = plotLeft + slotIndex * slotWidth + (slotWidth * paddingRatio) / 2;
       return { x, width: usableWidth, center: x + usableWidth / 2 };
     };
 
@@ -509,6 +558,8 @@ export const Datum = {
               ? getNumericX(numericValue)
               : getX(index, xCategories.length);
 
+          if (xPos < plotLeft || xPos > plotRight) return;
+
           const tickEndY = plotBottom + TICK_LENGTH;
 
           const tick = document.createElementNS(SVG_NS, 'line');
@@ -565,6 +616,20 @@ export const Datum = {
     // 2. Plot Area Canvas Group
     const plotAreaGroup = document.createElementNS(SVG_NS, 'g');
     plotAreaGroup.setAttribute('class', 'datum-plot-area');
+
+    if (!isPolar && (hasMinY || hasMaxY || hasXBounds)) {
+      const boundsClip = document.createElementNS(SVG_NS, 'clipPath');
+      const boundsClipId = `${clipId}-bounds`;
+      boundsClip.setAttribute('id', boundsClipId);
+      const boundsRect = document.createElementNS(SVG_NS, 'rect');
+      boundsRect.setAttribute('x', plotLeft);
+      boundsRect.setAttribute('y', plotTop);
+      boundsRect.setAttribute('width', plotWidth);
+      boundsRect.setAttribute('height', plotHeight);
+      boundsClip.appendChild(boundsRect);
+      svg.appendChild(boundsClip);
+      plotAreaGroup.setAttribute('clip-path', `url(#${boundsClipId})`);
+    }
 
     if (isAnimated) {
       const clipWrapperGroup = document.createElementNS(SVG_NS, 'g');
@@ -634,6 +699,7 @@ export const Datum = {
         getY,
         getNumericX,
         isScatterOnly,
+        hasXBounds,
         plotLeft,
         plotRight,
         plotTop,
@@ -647,9 +713,14 @@ export const Datum = {
 
     // 3. Legend Component Group
     if (showLegend && !isHeatmap) {
-      renderLegend(svg, layers, renderedLayerGroups, { width, height, padding });
+      const legendGroup = renderLegend(svg, layers, renderedLayerGroups, { width, height, padding, hiddenLegendItems });
+      if (isAnimated && legendGroup) {
+        const legendClipWrapper = document.createElementNS(SVG_NS, 'g');
+        legendClipWrapper.setAttribute('class', 'datum-clip-wrapper datum-legend-clip-wrapper');
+        svg.appendChild(legendClipWrapper);
+        legendClipWrapper.appendChild(legendGroup);
+      }
     }
 
     return base;
-  }
-};
+}

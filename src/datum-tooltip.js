@@ -115,6 +115,7 @@ export function setupCrosshairOverlay(context) {
     getNumericX,
     getY,
     isScatterOnly,
+    hasXBounds,
     plotLeft,
     plotRight,
     plotTop,
@@ -218,6 +219,7 @@ export function setupCrosshairOverlay(context) {
 
     for (let i = 0; i < total; i++) {
       const cx = getSnapX(i);
+      if (cx < plotLeft || cx > plotRight) continue;
       const dist = Math.abs(coords.x - cx);
 
       if (dist < minDistance) {
@@ -226,7 +228,13 @@ export function setupCrosshairOverlay(context) {
       }
     }
 
-    if (!isScatterOnly) {
+    if (!Number.isFinite(minDistance)) {
+      overlayGroup.style.display = 'none';
+      tooltipController.hide();
+      return;
+    }
+
+    if (!isScatterOnly && !hasXBounds) {
       const slotWidth = plotWidth / (total || 1);
 
       if (coords.x >= plotRight - slotWidth / 2) {

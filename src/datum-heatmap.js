@@ -34,6 +34,7 @@ function interpolateColor(color1, color2, factor) {
 
 export function heatmap(data = [], keysAndOptions = {}) {
   const {
+    name,
     x = 'x',
     y = 'y',
     value = 'value',
@@ -66,7 +67,7 @@ export function heatmap(data = [], keysAndOptions = {}) {
     type: 'heatmap',
     data: normalizedData,
     keys: { x, y, value },
-    options: { minColor, maxColor, stroke, strokeWidth, rx, showValues, valueColor, tooltip }
+    options: { name, minColor, maxColor, stroke, strokeWidth, rx, showValues, valueColor, tooltip }
   };
 }
 

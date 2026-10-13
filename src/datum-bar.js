@@ -13,6 +13,7 @@ const DEFAULT_OPTIONS = {
 
 export function bar(data = [], keysAndOptions = {}) {
   const {
+    name,
     x = 'x',
     y = 'y',
     fill = DEFAULT_OPTIONS.fill,
@@ -34,7 +35,7 @@ export function bar(data = [], keysAndOptions = {}) {
     type: 'bar',
     data: normalizedData,
     keys: { x, y },
-    options: { fill, stroke, strokeWidth, rx, opacity, stackId }
+    options: { name, fill, stroke, strokeWidth, rx, opacity, stackId }
   };
 }
 

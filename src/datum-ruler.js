@@ -12,6 +12,7 @@ const DEFAULT_OPTIONS = {
 
 export function ruler(data = [], keysAndOptions = {}) {
   const {
+    name,
     x = 'x',
     y = 'y',
     value,
@@ -26,7 +27,7 @@ export function ruler(data = [], keysAndOptions = {}) {
     type: 'ruler',
     data,
     keys: { x, y },
-    options: { value, direction, stroke, strokeWidth, dashed, dashArray }
+    options: { name, value, direction, stroke, strokeWidth, dashed, dashArray }
   };
 }
 

@@ -39,6 +39,7 @@ function describeArc(cx, cy, rOuter, rInner, startAngle, endAngle) {
 
 export function pie(data = [], keysAndOptions = {}) {
   const {
+    name,
     label = 'label',
     value = 'value',
     // Support either innerRadius or innerRadiusRatio
@@ -64,7 +65,7 @@ export function pie(data = [], keysAndOptions = {}) {
     type: 'pie',
     data: normalizedData,
     keys: { label, value },
-    options: {
+    options: { name,
       innerRadius,
       stroke,
       strokeWidth,

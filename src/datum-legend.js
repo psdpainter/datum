@@ -55,6 +55,9 @@ export function renderLegend(svg, layers, renderedLayerGroups, options = {}) {
   layers.forEach((layer, layerIndex) => {
     if (layer.options?.showInLegend === false || layer.options?.legend === false) return;
 
+    const layerLabel = String(layer.options?.name ?? '').trim();
+    if (!layerLabel) return;
+
     const group = renderedLayerGroups[layerIndex];
 
     if (layer.type === 'pie') {
@@ -91,15 +94,6 @@ export function renderLegend(svg, layers, renderedLayerGroups, options = {}) {
       return;
     }
 
-    const layerLabel = String(
-      layer.options?.name ??
-      layer.options?.label ??
-      (layer.type === 'bar' ? `Series ${layerIndex + 1}` :
-       layer.type === 'candlestick' ? 'Candlesticks' :
-       layer.type === 'range' ? 'Range' :
-       `Series ${layerIndex + 1}`)
-    );
-
     const color = resolveSeriesColor(layer, layerIndex);
 
     legendItems.push({
@@ -125,7 +119,7 @@ export function renderLegend(svg, layers, renderedLayerGroups, options = {}) {
   const swatchSize = 10;
   let currentX = 0;
 
-  legendItems.forEach(item => {
+  legendItems.forEach((item, index) => {
     const itemG = document.createElementNS(SVG_NS, 'g');
     itemG.setAttribute('class', 'datum-legend-item');
 
@@ -160,6 +154,12 @@ export function renderLegend(svg, layers, renderedLayerGroups, options = {}) {
       }
     });
 
+    if (options.hiddenLegendItems?.[index]) {
+      item.visible = false;
+      item.onToggle(false);
+      itemG.classList.add('datum-legend-item-disabled');
+    }
+
     legendGroup.appendChild(itemG);
     currentX += totalItemWidth + itemSpacing;
   });
@@ -168,4 +168,5 @@ export function renderLegend(svg, layers, renderedLayerGroups, options = {}) {
   const legendX = Math.max(padding.left, (width - totalLegendWidth) / 2);
   const legendY = height - 12;
   legendGroup.setAttribute('transform', `translate(${legendX}, ${legendY})`);
+  return legendGroup;
 }

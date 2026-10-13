@@ -10,6 +10,7 @@ const DEFAULT_OPTIONS = {
 
 export function range(data = [], keysAndOptions = {}) {
   const {
+    name,
     x = 'x',
     yMin = 'yMin',
     yMax = 'yMax',
@@ -31,7 +32,7 @@ export function range(data = [], keysAndOptions = {}) {
     type: 'range',
     data: normalizedData,
     keys: { x, yMin, yMax },
-    options: { fill, opacity, stroke, strokeWidth }
+    options: { name, fill, opacity, stroke, strokeWidth }
   };
 }
 
