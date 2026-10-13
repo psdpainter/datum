@@ -93,16 +93,10 @@ export function createBase(options = {}) {
   }
 
   const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('xmlns', SVG_NS);
   svg.setAttribute('class', 'datum-svg');
   svg.setAttribute('height', numericHeight);
   svg.setAttribute('viewBox', `0 0 ${numericWidth} ${numericHeight}`);
-
-  if (options.title) {
-    svg.setAttribute('title', options.title);
-    const svgTitle = document.createElementNS(SVG_NS, 'title');
-    svgTitle.textContent = options.title;
-    svg.appendChild(svgTitle);
-  }
 
   container.appendChild(svg);
 
