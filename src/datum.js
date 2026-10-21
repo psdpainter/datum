@@ -71,6 +71,9 @@ function renderChart(options, existingBase) {
     const chartTypes = layers.map(l => l.type).filter(Boolean).join(',');
 
     const config = options.config || {};
+    const showBackground = options.clean !== true && config.background !== false;
+    const showXAxis = options.clean !== true && config.xAxis !== false;
+    const showYAxis = options.clean !== true && config.yAxis !== false;
     const xAxisConfig = config.xAxis || {};
     const yAxisConfig = config.yAxis || {};
     const userPadding = config.padding || {};
@@ -214,7 +217,7 @@ function renderChart(options, existingBase) {
     let dynamicLeftPadding;
     if (userPadding.left !== undefined) {
       dynamicLeftPadding = userPadding.left;
-    } else if (isPolar) {
+    } else if (isPolar || !showYAxis) {
       dynamicLeftPadding = 24;
     } else {
       const estimatedYTextWidth = maxYTickCharLength * (FONT_SIZE * CHAR_WIDTH_RATIO);
@@ -225,8 +228,8 @@ function renderChart(options, existingBase) {
     let dynamicBottomPadding;
     if (userPadding.bottom !== undefined) {
       dynamicBottomPadding = userPadding.bottom;
-    } else if (isPolar) {
-      dynamicBottomPadding = 24;
+    } else if (isPolar || !showXAxis) {
+      dynamicBottomPadding = 24 + (!isPolar && showLegend && !isHeatmap ? 28 : 0);
     } else {
       const estimatedXTextWidth = maxXCharLength * (FONT_SIZE * CHAR_WIDTH_RATIO);
       if (labelAngle === 0) {
@@ -243,7 +246,7 @@ function renderChart(options, existingBase) {
     }
 
     let dynamicRightPadding = userPadding.right !== undefined ? userPadding.right : 24;
-    if (labelAngle > 0 && !isPolar) {
+    if (showXAxis && labelAngle > 0 && !isPolar) {
       const angleRad = (labelAngle * Math.PI) / 180;
       const rightProjection = Math.cos(angleRad) * (maxXCharLength * (FONT_SIZE * CHAR_WIDTH_RATIO));
       dynamicRightPadding = Math.max(24, Math.ceil(rightProjection));
@@ -270,6 +273,13 @@ function renderChart(options, existingBase) {
     }
     const { svg, container, width, height } = base;
     svg.setAttribute('data-datum-chart-type', chartTypes || 'composite');
+    if (!showBackground) {
+      container.style.background = 'transparent';
+      svg.style.background = 'transparent';
+    } else {
+      container.style.removeProperty('background');
+      svg.style.removeProperty('background');
+    }
 
     const chartClasses = ['datum-chart'];
     if (isAnimated) {
@@ -409,10 +419,14 @@ function renderChart(options, existingBase) {
 
     // 1. Grouped Axes
     if (!isPolar) {
+      const gridGroup = document.createElementNS(SVG_NS, 'g');
+      gridGroup.setAttribute('class', 'datum-grid');
+      if (showBackground && !isHeatmap) svg.appendChild(gridGroup);
+
       // Y-AXIS GROUP
       const yAxisGroup = document.createElementNS(SVG_NS, 'g');
       yAxisGroup.setAttribute('class', 'datum-axis datum-axis-y');
-      svg.appendChild(yAxisGroup);
+      if (showYAxis) svg.appendChild(yAxisGroup);
 
       if (isHeatmap) {
         yCategories.forEach((cat, index) => {
@@ -435,7 +449,7 @@ function renderChart(options, existingBase) {
           gridLine.setAttribute('x2', plotRight);
           gridLine.setAttribute('y1', tickY);
           gridLine.setAttribute('y2', tickY);
-          yAxisGroup.appendChild(gridLine);
+          if (showBackground) gridGroup.appendChild(gridLine);
 
           const yLabel = document.createElementNS(SVG_NS, 'text');
           yLabel.setAttribute('class', 'datum-axis-label datum-axis-text datum-axis-text-y datum-ff datum-fs-sm datum-fw-400 datum-color-muted');
@@ -458,7 +472,7 @@ function renderChart(options, existingBase) {
       // X-AXIS GROUP
       const xAxisGroup = document.createElementNS(SVG_NS, 'g');
       xAxisGroup.setAttribute('class', 'datum-axis datum-axis-x');
-      svg.appendChild(xAxisGroup);
+      if (showXAxis) svg.appendChild(xAxisGroup);
 
       const xAxisLine = document.createElementNS(SVG_NS, 'line');
       xAxisLine.setAttribute('class', 'datum-axis-line');

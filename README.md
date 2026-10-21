@@ -73,6 +73,39 @@ Datum.chart({
 });
 ```
 
+## Chart background and axes
+
+Use `clean: true` to render a transparent chart without gridlines or either axis:
+
+```js
+Datum.chart({
+  target: '#chart',
+  clean: true,
+  datum: [Datum.line([14, 8, 24, 7])]
+});
+```
+
+Or control each option independently (all default to `true`):
+
+```js
+Datum.chart({
+  target: '#chart',
+  config: {
+    background: false,
+    xAxis: false,
+    yAxis: false
+  },
+  datum: [Datum.line([14, 8, 24, 7])]
+});
+```
+
+`background: false` removes gridlines and makes the chart container and SVG
+transparent. Hiding an axis removes its line, ticks, and labels, and releases
+its automatic label padding. Explicit `config.padding` values are preserved.
+Axis configuration objects remain supported. `clean: true` takes precedence
+over these three config options. Titles, legends, and tooltips remain available;
+use `config.legend: false` to hide the legend separately.
+
 ## Composing Structured Data
 
 Datum accepts structured datasets and custom key mappings across mixed visual types:
