@@ -174,7 +174,9 @@ function renderChart(options, existingBase) {
     const ySpan = (rawMaxY - rawMinY) || 1;
 
     const requiresZeroBaseline = layers.some(l => l.type === 'bar' || l.type === 'histogram');
-    const autoMinY = requiresZeroBaseline ? Math.min(0, rawMinY) : Math.floor(rawMinY - ySpan * 0.05);
+    const autoMinY = rawMinY >= 0
+      ? 0
+      : requiresZeroBaseline ? rawMinY : Math.floor(rawMinY - ySpan * 0.05);
     const autoMaxY = Math.ceil(rawMaxY + ySpan * 0.05);
     const hasMinY = yAxisConfig.min !== undefined;
     const hasMaxY = yAxisConfig.max !== undefined;
@@ -482,59 +484,6 @@ function renderChart(options, existingBase) {
       xAxisLine.setAttribute('y2', plotBottom);
       xAxisGroup.appendChild(xAxisLine);
 
-      // if (xCategories.length > 0) {
-      //   const avgCharWidth = FONT_SIZE * CHAR_WIDTH_RATIO;
-      //   let estimatedWidth = Math.max(20, maxXCharLength * avgCharWidth);
-      //   if (labelAngle !== 0) {
-      //     const angleRad = Math.abs(labelAngle) * (Math.PI / 180);
-      //     estimatedWidth = Math.cos(angleRad) * estimatedWidth + 14;
-      //   }
-
-      //   const safetyMargin = 12;
-      //   const maxFittingLabels = Math.max(1, Math.floor(plotWidth / (estimatedWidth + safetyMargin)));
-      //   const autoInterval = Math.max(1, Math.ceil(xCategories.length / maxFittingLabels));
-      //   const tickInterval = userInterval || autoInterval;
-
-      //   xCategories.forEach((label, index) => {
-      //     const isFirst = index === 0;
-      //     const isLast = index === xCategories.length - 1;
-      //     const isStep = index % tickInterval === 0;
-
-      //     const shouldRender = isFirst || isStep || isLast;
-      //     if (!shouldRender) return;
-
-      //     const xPos = getX(index, xCategories.length);
-      //     const tickEndY = plotBottom + TICK_LENGTH;
-
-      //     const tick = document.createElementNS(SVG_NS, 'line');
-      //     tick.setAttribute('class', 'datum-axis-tick');
-      //     tick.setAttribute('x1', xPos);
-      //     tick.setAttribute('x2', xPos);
-      //     tick.setAttribute('y1', plotBottom);
-      //     tick.setAttribute('y2', tickEndY);
-      //     xAxisGroup.appendChild(tick);
-
-      //     const labelY = tickEndY + 8;
-      //     const xLabel = document.createElementNS(SVG_NS, 'text');
-      //     xLabel.setAttribute('class', 'datum-axis-label datum-axis-text datum-axis-text-x datum-ff datum-fs-sm datum-fw-400 datum-color-muted');
-      //     xLabel.setAttribute('x', xPos);
-      //     xLabel.setAttribute('y', labelY);
-
-      //     if (labelAngle === 0) {
-      //       xLabel.setAttribute('text-anchor', 'middle');
-      //     } else if (labelAngle < 0) {
-      //       xLabel.setAttribute('text-anchor', 'end');
-      //       xLabel.setAttribute('transform', `rotate(${labelAngle}, ${xPos}, ${labelY})`);
-      //     } else {
-      //       xLabel.setAttribute('text-anchor', 'start');
-      //       xLabel.setAttribute('transform', `rotate(${labelAngle}, ${xPos}, ${labelY})`);
-      //     }
-
-      //     xLabel.textContent = label;
-      //     xAxisGroup.appendChild(xLabel);
-      //   });
-      // }
-
       if (xCategories.length > 0) {
         const avgCharWidth = FONT_SIZE * CHAR_WIDTH_RATIO;
         let estimatedWidth = Math.max(20, maxXCharLength * avgCharWidth);
@@ -574,6 +523,12 @@ function renderChart(options, existingBase) {
 
           if (xPos < plotLeft || xPos > plotRight) return;
 
+          const tickGroup = document.createElementNS(SVG_NS, 'g');
+          tickGroup.setAttribute('class', 'datum-axis-tick-group');
+          // Normalize the stagger to the plot width so dense axes finish on time.
+          tickGroup.style.setProperty('--datum-axis-progress', (xPos - plotLeft) / plotWidth);
+          xAxisGroup.appendChild(tickGroup);
+
           const tickEndY = plotBottom + TICK_LENGTH;
 
           const tick = document.createElementNS(SVG_NS, 'line');
@@ -582,7 +537,7 @@ function renderChart(options, existingBase) {
           tick.setAttribute('x2', xPos);
           tick.setAttribute('y1', plotBottom);
           tick.setAttribute('y2', tickEndY);
-          xAxisGroup.appendChild(tick);
+          tickGroup.appendChild(tick);
 
           const labelY = tickEndY + 8;
 
@@ -612,7 +567,7 @@ function renderChart(options, existingBase) {
           }
 
           xLabel.textContent = label;
-          xAxisGroup.appendChild(xLabel);
+          tickGroup.appendChild(xLabel);
         });
       }
     }

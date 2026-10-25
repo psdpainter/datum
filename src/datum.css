@@ -241,11 +241,18 @@
 }
 
 /* When the chart has animation enabled */
-.datum-chart.is-animated .datum-axis-label {
+.datum-chart.is-animated .datum-axis-y .datum-axis-label {
   opacity: 0;
   animation: datum-fade-in 0.35s ease forwards;
   /* Staggers using sibling-index() multiplied by the axis delay */
   animation-delay: calc(sibling-index() * var(--datum-axis-delay, 40ms));
+}
+
+/* Each x-axis tick and label reveals together within the layer wipe window. */
+.datum-chart.is-animated .datum-axis-tick-group {
+  opacity: 0;
+  animation: datum-fade-in calc(var(--datum-reveal-duration, 1s) * 0.35) ease forwards;
+  animation-delay: calc(var(--datum-canvas-delay, 0.5s) + var(--datum-reveal-duration, 1s) * 0.65 * var(--datum-axis-progress, 0));
 }
 
 /* Keyframes for text fade */
@@ -261,7 +268,7 @@
 /* Animate reveal directly on the wrapper group using inset clip-path */
 .datum-chart.is-animated .datum-clip-wrapper {
   clip-path: inset(-20px 100% -20px 0);
-  animation: datum-wipe-reveal 1s ease-in-out forwards;
+  animation: datum-wipe-reveal var(--datum-reveal-duration, 1s) ease-in-out forwards;
   animation-delay: var(--datum-canvas-delay, 0.5s);
 }
 

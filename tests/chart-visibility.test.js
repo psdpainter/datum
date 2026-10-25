@@ -61,3 +61,28 @@ test('defaults and axis object configuration remain supported', () => {
   assert.equal(count(base, 'datum-grid'), 1);
   assert.equal(count(base, 'datum-axis-text-x'), 2);
 });
+
+const yTicks = base => base.svg.querySelectorAll('.datum-axis-text-y')
+  .map(label => Number(label.textContent.replaceAll(',', '')));
+
+test('nonnegative data starts the y-axis at zero', () => {
+  for (const values of [[0, 30, 1], [10, 20, 30], [0, 0, 0], [5, 5, 5]]) {
+    const ticks = yTicks(chart({ datum: [Datum.line(values)] }));
+    assert.equal(ticks[0], 0);
+    assert.ok(ticks.at(-1) >= Math.max(...values));
+  }
+});
+
+test('negative data remains visible with automatic bounds', () => {
+  const ticks = yTicks(chart({ datum: [Datum.line([-10, 0, 30])] }));
+  assert.ok(ticks[0] <= -10);
+  assert.ok(ticks.at(-1) >= 30);
+});
+
+test('explicit y-axis bounds override the automatic zero baseline', () => {
+  for (const bounds of [{ min: -5, max: 40 }, { min: 10, max: 40 }, { min: -5 }, { max: 40 }]) {
+    const ticks = yTicks(chart({ datum: [Datum.line([10, 20, 30])], config: { yAxis: bounds } }));
+    assert.equal(ticks[0], bounds.min ?? 0);
+    if (bounds.max !== undefined) assert.equal(ticks.at(-1), bounds.max);
+  }
+});
