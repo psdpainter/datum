@@ -52,7 +52,22 @@ export function renderBarLayer(layer, context, barMeta) {
   layer.resolvedFillColors = [];
   const gradientFills = new Map();
   let defs;
+  let gradientTop;
+  let gradientBottom;
   if (options.gradient === true) {
+    // Match an area's bounding-box fade, shared by every bar in this layer.
+    // Resolve stacked bounds before rendering mutates the stack offsets.
+    gradientTop = Infinity;
+    gradientBottom = -Infinity;
+    data.forEach((d, index) => {
+      const value = Number(d[keys.y]) || 0;
+      const bottomValue = barGroupMode === 'stacked' ? stackOffsets[index] || 0 : 0;
+      const top = getY(bottomValue + value);
+      const bottom = barGroupMode === 'stacked' ? getY(bottomValue) : plotBottom;
+      gradientTop = Math.min(gradientTop, top);
+      gradientBottom = Math.max(gradientBottom, top + Math.max(0, bottom - top));
+    });
+    if (gradientBottom === gradientTop) gradientBottom = gradientTop + 1;
     defs = document.createElementNS(SVG_NS, 'defs');
     svg.appendChild(defs);
   }
@@ -68,10 +83,11 @@ export function renderBarLayer(layer, context, barMeta) {
         const gradientId = `datum-grad-${generateGuid()}`;
         const linearGradient = document.createElementNS(SVG_NS, 'linearGradient');
         linearGradient.setAttribute('id', gradientId);
-        linearGradient.setAttribute('x1', '0%');
-        linearGradient.setAttribute('y1', '0%');
-        linearGradient.setAttribute('x2', '0%');
-        linearGradient.setAttribute('y2', '100%');
+        linearGradient.setAttribute('gradientUnits', 'userSpaceOnUse');
+        linearGradient.setAttribute('x1', 0);
+        linearGradient.setAttribute('y1', gradientTop);
+        linearGradient.setAttribute('x2', 0);
+        linearGradient.setAttribute('y2', gradientBottom);
         for (const [offset, opacity] of [['0%', options.opacity], ['100%', 0]]) {
           const stop = document.createElementNS(SVG_NS, 'stop');
           stop.setAttribute('offset', offset);

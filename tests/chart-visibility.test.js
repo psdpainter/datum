@@ -28,18 +28,24 @@ function chart(options = {}) {
 }
 const count = (base, name) => base.svg.querySelectorAll(`.${name}`).length;
 
-test('bar gradients fade each fill color from configured opacity to transparent', () => {
-  for (const stacked of [false, true]) {
+test('bar gradients share layer bounds across bars and fill colors', () => {
+  for (const mode of ['single', 'grouped', 'stacked']) {
+    const stacked = mode === 'stacked';
     const options = { gradient: true, opacity: 0.6, fill: (_, i) => i === 1 ? 'red' : 'blue', stackId: stacked ? 'total' : null };
-    const base = chart({ datum: [Datum.bar([1, 2, 3], options), Datum.bar([2, 3, 4], options)] });
+    const datum = [Datum.bar([1, 2, 3], options)];
+    if (mode !== 'single') datum.push(Datum.bar([2, 3, 4], options));
+    const base = chart({ datum });
     const layers = base.svg.querySelectorAll('.datum-layer-bar');
     const ids = new Set();
     for (const layer of layers) {
       const [defs, ...bars] = layer.children;
       assert.equal(defs.children.length, 2);
       for (const gradient of defs.children) {
-        assert.equal(gradient.attributes.y1, '0%');
-        assert.equal(gradient.attributes.y2, '100%');
+        assert.equal(gradient.attributes.gradientUnits, 'userSpaceOnUse');
+        assert.equal(Number(gradient.attributes.y1), Math.min(...bars.map(bar => Number(bar.attributes.y))));
+        assert.equal(Number(gradient.attributes.y2), Math.max(...bars.map(bar => Number(bar.attributes.y) + Number(bar.attributes.height))));
+        // A shorter bar starts partway down the shared fade.
+        assert.ok(Number(bars[0].attributes.y) > Number(gradient.attributes.y1));
         assert.equal(gradient.attributes.x1, gradient.attributes.x2);
         assert.deepEqual(gradient.children.map(stop => stop.attributes['stop-opacity']), ['0.6', '0']);
         assert.deepEqual(gradient.children.map(stop => stop.attributes.offset), ['0%', '100%']);

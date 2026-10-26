@@ -139,8 +139,9 @@ config: {
 ## Bar charts, gradients, and opacity
 
 Pass `gradient: true` to a bar or area layer to fade its fill vertically from the
-configured opacity at the top to transparent at the bottom. For bars, the fade
-spans each bar's height, including grouped bars and stacked segments.
+configured opacity at the top to transparent at the bottom. For bars, one shared
+fade spans the entire layer's vertical bounds, including grouped bars and stacked
+segments. Shorter bars begin partway through the fade instead of restarting it.
 
 ```js
 Datum.chart({
