@@ -28,6 +28,38 @@ function chart(options = {}) {
 }
 const count = (base, name) => base.svg.querySelectorAll(`.${name}`).length;
 
+test('bar gradients fade each fill color from configured opacity to transparent', () => {
+  for (const stacked of [false, true]) {
+    const options = { gradient: true, opacity: 0.6, fill: (_, i) => i === 1 ? 'red' : 'blue', stackId: stacked ? 'total' : null };
+    const base = chart({ datum: [Datum.bar([1, 2, 3], options), Datum.bar([2, 3, 4], options)] });
+    const layers = base.svg.querySelectorAll('.datum-layer-bar');
+    const ids = new Set();
+    for (const layer of layers) {
+      const [defs, ...bars] = layer.children;
+      assert.equal(defs.children.length, 2);
+      for (const gradient of defs.children) {
+        assert.equal(gradient.attributes.y1, '0%');
+        assert.equal(gradient.attributes.y2, '100%');
+        assert.equal(gradient.attributes.x1, gradient.attributes.x2);
+        assert.deepEqual(gradient.children.map(stop => stop.attributes['stop-opacity']), ['0.6', '0']);
+        assert.deepEqual(gradient.children.map(stop => stop.attributes.offset), ['0%', '100%']);
+        assert.ok(!ids.has(gradient.attributes.id));
+        ids.add(gradient.attributes.id);
+      }
+      assert.equal(bars[0].attributes.fill, `url(#${defs.children[0].attributes.id})`);
+      assert.equal(bars[1].attributes.fill, `url(#${defs.children[1].attributes.id})`);
+      assert.equal(bars[2].attributes.fill, bars[0].attributes.fill);
+      assert.equal(bars[0].attributes.opacity, undefined);
+      assert.equal(defs.children[0].children[0].attributes['stop-color'], 'blue');
+      assert.equal(defs.children[1].children[0].attributes['stop-color'], 'red');
+    }
+  }
+  const solid = chart({ datum: [Datum.bar([1], { fill: 'blue', opacity: 0.6 })] });
+  const rect = solid.svg.querySelectorAll('.datum-layer-bar')[0].children[0];
+  assert.equal(rect.attributes.fill, 'blue');
+  assert.equal(rect.attributes.opacity, '0.6');
+});
+
 test('visibility options are independent for every combination', () => {
   for (const background of [true, false]) {
     for (const xAxis of [true, false]) {
@@ -60,6 +92,22 @@ test('defaults and axis object configuration remain supported', () => {
   assert.equal(count(base, 'datum-axis'), 2);
   assert.equal(count(base, 'datum-grid'), 1);
   assert.equal(count(base, 'datum-axis-text-x'), 2);
+});
+
+test('includeAxisLines hides only the axis boundary lines and defaults to true', () => {
+  const defaults = chart();
+  const enabled = chart({ config: { includeAxisLines: true } });
+  const disabled = chart({ config: { includeAxisLines: false } });
+  assert.equal(count(defaults, 'datum-axis-line'), 2);
+  assert.equal(count(enabled, 'datum-axis-line'), 2);
+  assert.equal(count(disabled, 'datum-axis-line'), 0);
+  const snapshot = node => ({
+    attributes: node.attributes,
+    children: node.children
+      .filter(child => child.attributes.class !== 'datum-axis-line')
+      .map(snapshot)
+  });
+  assert.deepEqual(snapshot(disabled.svg), snapshot(defaults.svg));
 });
 
 const yTicks = base => base.svg.querySelectorAll('.datum-axis-text-y')

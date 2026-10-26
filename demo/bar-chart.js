@@ -56,28 +56,24 @@ Datum.chart({
 });
 
 Datum.chart({
-  target: '#chart',
-  title: 'Quarterly Sales Channels',
-  subTitle: 'Online vs Retail (Grouped)',
+  target: '#chart2',
+  title: 'Gradient bar chart',
+  config: {
+    xAxis: {
+      labelAngle: -45
+    }
+  },
   width: '100%',
-  height: 380,
   animated: true,
   datum: [
-    Datum.bar(salesData, { x: 'quarter', y: 'online', fill: Color.Blue }),
-    Datum.bar(salesData, { x: 'quarter', y: 'retail', fill: Color.Cyan })
-  ]
-});
 
-Datum.chart({
-  target: '#chart',
-  title: 'Bar chart (v3)',
-  subTitle: 'Sample chart using an array of random integers only',
-  width: '100%',
-  height: 360,
-  animated: true,
-  datum: [
-    Datum.bar(numbers, {
-      fill: (d) => d.y > 20 ? Color.Red : Color.Green
-    })
+    Datum.bar(aaplStock, { 
+      x: 'day', 
+      y: 'open', 
+      fill: (d) => {
+        return d.close > d.open ? Color.Green : Color.Red
+      },
+      gradient: true
+    }),
   ]
 });

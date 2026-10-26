@@ -71,6 +71,7 @@ function renderChart(options, existingBase) {
     const chartTypes = layers.map(l => l.type).filter(Boolean).join(',');
 
     const config = options.config || {};
+    const includeAxisLines = config.includeAxisLines !== false;
     const showBackground = options.clean !== true && config.background !== false;
     const showXAxis = options.clean !== true && config.xAxis !== false;
     const showYAxis = options.clean !== true && config.yAxis !== false;
@@ -469,7 +470,7 @@ function renderChart(options, existingBase) {
       yAxisLine.setAttribute('x2', plotLeft);
       yAxisLine.setAttribute('y1', plotTop);
       yAxisLine.setAttribute('y2', plotBottom);
-      yAxisGroup.appendChild(yAxisLine);
+      if (includeAxisLines) yAxisGroup.appendChild(yAxisLine);
 
       // X-AXIS GROUP
       const xAxisGroup = document.createElementNS(SVG_NS, 'g');
@@ -482,7 +483,7 @@ function renderChart(options, existingBase) {
       xAxisLine.setAttribute('x2', plotRight);
       xAxisLine.setAttribute('y1', plotBottom);
       xAxisLine.setAttribute('y2', plotBottom);
-      xAxisGroup.appendChild(xAxisLine);
+      if (includeAxisLines) xAxisGroup.appendChild(xAxisLine);
 
       if (xCategories.length > 0) {
         const avgCharWidth = FONT_SIZE * CHAR_WIDTH_RATIO;

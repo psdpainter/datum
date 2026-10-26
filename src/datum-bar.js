@@ -1,5 +1,5 @@
 // src/datum-bar.js
-import { DEFAULT_SERIES_COLORS } from './datum-core.js';
+import { DEFAULT_SERIES_COLORS, generateGuid } from './datum-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -8,7 +8,8 @@ const DEFAULT_OPTIONS = {
   stroke: null,
   strokeWidth: 0,
   rx: 2,
-  opacity: 1
+  opacity: 1,
+  gradient: false
 };
 
 export function bar(data = [], keysAndOptions = {}) {
@@ -21,6 +22,7 @@ export function bar(data = [], keysAndOptions = {}) {
     strokeWidth = DEFAULT_OPTIONS.strokeWidth,
     rx = DEFAULT_OPTIONS.rx,
     opacity = DEFAULT_OPTIONS.opacity,
+    gradient = DEFAULT_OPTIONS.gradient,
     stackId = null
   } = keysAndOptions;
 
@@ -35,7 +37,7 @@ export function bar(data = [], keysAndOptions = {}) {
     type: 'bar',
     data: normalizedData,
     keys: { x, y },
-    options: { name, fill, stroke, strokeWidth, rx, opacity, stackId }
+    options: { name, fill, stroke, strokeWidth, rx, opacity, gradient, stackId }
   };
 }
 
@@ -48,12 +50,40 @@ export function renderBarLayer(layer, context, barMeta) {
 
   const fallbackColor = DEFAULT_SERIES_COLORS[barIndex % DEFAULT_SERIES_COLORS.length];
   layer.resolvedFillColors = [];
+  const gradientFills = new Map();
+  let defs;
+  if (options.gradient === true) {
+    defs = document.createElementNS(SVG_NS, 'defs');
+    svg.appendChild(defs);
+  }
 
   data.forEach((d, catIndex) => {
     const fillColor = (typeof options.fill === 'function'
       ? options.fill(d, catIndex, data)
       : options.fill) || fallbackColor;
     layer.resolvedFillColors[catIndex] = fillColor;
+    let finalFill = fillColor;
+    if (defs) {
+      if (!gradientFills.has(fillColor)) {
+        const gradientId = `datum-grad-${generateGuid()}`;
+        const linearGradient = document.createElementNS(SVG_NS, 'linearGradient');
+        linearGradient.setAttribute('id', gradientId);
+        linearGradient.setAttribute('x1', '0%');
+        linearGradient.setAttribute('y1', '0%');
+        linearGradient.setAttribute('x2', '0%');
+        linearGradient.setAttribute('y2', '100%');
+        for (const [offset, opacity] of [['0%', options.opacity], ['100%', 0]]) {
+          const stop = document.createElementNS(SVG_NS, 'stop');
+          stop.setAttribute('offset', offset);
+          stop.setAttribute('stop-color', fillColor);
+          stop.setAttribute('stop-opacity', opacity);
+          linearGradient.appendChild(stop);
+        }
+        defs.appendChild(linearGradient);
+        gradientFills.set(fillColor, `url(#${gradientId})`);
+      }
+      finalFill = gradientFills.get(fillColor);
+    }
     const band = getBand(catIndex);
     const rawVal = Number(d[keys.y]) || 0;
 
@@ -82,13 +112,14 @@ export function renderBarLayer(layer, context, barMeta) {
     rect.setAttribute('y', yTop);
     rect.setAttribute('width', Math.max(1, barWidth));
     rect.setAttribute('height', rectHeight);
-    rect.setAttribute('fill', fillColor);
+    rect.setAttribute('fill', finalFill);
     rect.setAttribute('rx', options.rx);
-    rect.setAttribute('opacity', options.opacity);
+    if (!defs) rect.setAttribute('opacity', options.opacity);
 
     if (options.stroke) {
       rect.setAttribute('stroke', options.stroke);
       rect.setAttribute('stroke-width', options.strokeWidth);
+      if (defs) rect.setAttribute('stroke-opacity', options.opacity);
     }
 
     svg.appendChild(rect);

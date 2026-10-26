@@ -106,6 +106,24 @@ Axis configuration objects remain supported. `clean: true` takes precedence
 over these three config options. Titles, legends, and tooltips remain available;
 use `config.legend: false` to hide the legend separately.
 
+Set `config.includeAxisLines: false` to hide the y-axis vertical boundary line
+and x-axis horizontal boundary line while keeping labels, ticks, gridlines, and
+padding. It defaults to `true`.
+
+```js
+config: {
+  includeAxisLines: false
+}
+```
+
+Bar layers support `gradient: true`, just like area layers. The fill fades
+vertically from the configured `opacity` at the top to transparent at the bottom
+of each bar. Solid fills remain the default.
+
+```js
+Datum.bar([14, 8, 24, 7], { fill: Color.Blue, gradient: true })
+```
+
 ## Composing Structured Data
 
 Datum accepts structured datasets and custom key mappings across mixed visual types:
